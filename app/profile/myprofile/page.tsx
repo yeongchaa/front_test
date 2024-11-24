@@ -1,17 +1,12 @@
 // 프로필 관리 화면
 "use client";
 
-import { useState } from "react"; // useState 추가
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import BottomNavigation from "@/components/common/BottomNavigation";
-import InputTitle from "@/components/login/InputTitle";
-import InputTxt from "@/components/login/InputTxt";
+import EditableName from "@/components/login/EditableName";
 
 export default function MyProfile() {
-  // 상태 관리 추가
-  const [name, setName] = useState<string>(""); // 이름 상태
-
   return (
     <div>
       {/** Header */}
@@ -46,12 +41,7 @@ export default function MyProfile() {
           <p className="text-[18px] font-bold">프로필 정보</p>
 
           {/** 이름 변경란 */}
-          <InputTitle title="이름" />
-          <InputTxt
-            type="name" // type을 "text"로 변경
-            value={name}
-            onChange={(e) => setName(e.target.value)} // 상태 업데이트
-          />
+          <EditableName />
         </div>
       </div>
 

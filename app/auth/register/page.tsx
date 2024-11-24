@@ -5,16 +5,36 @@ import InputTitle from "@/components/login/InputTitle";
 import BackButton from "@/components/common/BackButton"; // 뒤로가기 버튼 컴포넌트 경로
 import InputTxt from "@/components/login/InputTxt";
 import RegisterButton from "@/components/login/RegisterButton";
+import { createUser } from "@/app/services/createUser";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState(""); // 이메일 상태
   const [password, setPassword] = useState(""); // 비밀번호 상태
   const [name, setName] = useState(""); // 이름 상태
+  const [errorMessage, setErrorMessage] = useState<string | null>(null); // 에러 메시지 상태
 
-  // 가입하기 버튼 클릭 시 호출할 함수
-  const handleRegister = () => {
-    console.log("가입하기 버튼 클릭!");
-    // 가입하기 기능 추가 예정
+  // 회원가입 API 호출 함수
+  const handleRegister = async () => {
+    try {
+      // 사용자 계정 생성 API 호출
+      const response = await createUser(
+        name,
+        password,
+        email,
+        "default-profile-image-id" // 기본 이미지 ID
+      );
+
+      console.log("회원가입 성공:", response);
+      alert("회원가입이 완료되었습니다!");
+    } catch (error: unknown) {
+      // 에러 처리
+      if (error instanceof Error) {
+        console.error("회원가입 실패:", error.message);
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage("알 수 없는 오류가 발생했습니다.");
+      }
+    }
   };
 
   return (
@@ -55,6 +75,10 @@ export default function RegisterPage() {
           </div>
         </div>
         <div>
+          {/* 에러 메시지 출력 */}
+          {errorMessage && (
+            <p className="text-red-500 text-sm my-2">{errorMessage}</p>
+          )}
           {/* 회원가입 버튼 */}
           <RegisterButton onClick={handleRegister} />
         </div>

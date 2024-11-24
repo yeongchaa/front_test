@@ -3,7 +3,6 @@
 import React from "react";
 import { CameraIcon } from "@heroicons/react/24/solid"; // Heroicons의 카메라 아이콘 사용
 import Link from "next/link";
-import BottomNavigation from "../common/BottomNavigation";
 
 const SearchHeader: React.FC = () => {
   return (
@@ -22,11 +21,6 @@ const SearchHeader: React.FC = () => {
             <CameraIcon className="w-6 h-6 text-black hover:text-black transition-colors" />
           </button>
         </Link>
-      </div>
-
-      {/* 하단 네비게이션 */}
-      <div className="mt-auto sticky bottom-0 w-full">
-        <BottomNavigation />
       </div>
     </div>
   );
