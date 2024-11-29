@@ -1,3 +1,4 @@
+// 좋아요 버튼
 import React, { useState } from "react";
 import { HeartIcon } from "@heroicons/react/24/outline"; // Heroicons의 Heart 아이콘
 

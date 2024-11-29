@@ -1,22 +1,9 @@
-"use client"
+// 모든 페이지에서 공통으로 적용될 설정
+"use client";
 
 import React from "react";
-import localFont from "next/font/local";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'; // React Query 추가
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"; // React Query 추가
 import "./globals.css";
-
-// 폰트 설정
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
-
 
 // Query Client 생성
 const queryClient = new QueryClient(); // QueryClient 객체 생성
@@ -28,13 +15,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="en" className="font-sans">
+      <body>
         <QueryClientProvider client={queryClient}>
           {children}
-        </QueryClientProvider>        
+        </QueryClientProvider>
       </body>
     </html>
   );

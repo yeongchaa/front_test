@@ -9,6 +9,15 @@ import { ShoppingBagIcon } from "@heroicons/react/24/outline";
 export default function MyPage() {
   // 예시 userName 데이터
   const userName = "chachalee";
+
+  // 로그아웃 처리 함수 (단순 동작 처리)
+  const handleLogout = () => {
+    console.log("로그아웃 처리 중...");
+    alert("로그아웃 되었습니다."); // 성공 메시지 출력
+    // 로그아웃 후 이동 로직 추가 가능
+    window.location.href = "/"; // 홈 페이지로 이동
+  };
+
   return (
     <div className="flex flex-col min-h-screen items-center">
       {/** Header */}
@@ -35,11 +44,21 @@ export default function MyPage() {
           <Button label="프로필 관리" />
           <Button
             label="로그아웃"
-            onLogout={() => {
-              console.log("로그아웃 처리 중 ... ");
-              // 로그아웃 API 호출 등 추가 로직 작성해야 함.
-            }}
+            onLogout={handleLogout} // 로그아웃 버튼에 handleLogout 함수 연결
           />
+          {/**
+           * <코드 수정>
+           * 
+           * const handleLogout = async () => {
+  try {
+    await fetch("/api/logout", { method: "POST" });
+    window.location.href = "/";
+  } catch (error) {
+    console.error("로그아웃 실패:", error);
+  }
+};
+
+           */}
         </div>
       </div>
       <div className="w-full mt-6 border-t border-gray-300"></div>

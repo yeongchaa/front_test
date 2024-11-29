@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import InputTitle from "@/components/login/InputTitle";
-import BackButton from "@/components/common/BackButton"; // 뒤로가기 버튼 컴포넌트 경로
+import BackButton from "@/components/common/BackButton";
 import InputTxt from "@/components/login/InputTxt";
 import RegisterButton from "@/components/login/RegisterButton";
 import { createUser } from "@/app/services/createUser";
@@ -10,30 +10,35 @@ import { createUser } from "@/app/services/createUser";
 export default function RegisterPage() {
   const [email, setEmail] = useState(""); // 이메일 상태
   const [password, setPassword] = useState(""); // 비밀번호 상태
-  const [name, setName] = useState(""); // 이름 상태
+  const [username, setUsername] = useState(""); // 사용자 이름 상태
   const [errorMessage, setErrorMessage] = useState<string | null>(null); // 에러 메시지 상태
+  const [isLoading, setIsLoading] = useState(false); // 로딩 상태
 
-  // 회원가입 API 호출 함수
   const handleRegister = async () => {
+    setIsLoading(true); // 로딩 상태 시작
     try {
-      // 사용자 계정 생성 API 호출
+      // 기본 프로필 이미지 경로
+      const defaultProfileImageUrl = "/default-profile.png";
+
+      // 회원가입 API 호출
       const response = await createUser(
-        name,
+        username,
         password,
         email,
-        "default-profile-image-id" // 기본 이미지 ID
+        defaultProfileImageUrl
       );
 
       console.log("회원가입 성공:", response);
-      alert("회원가입이 완료되었습니다!");
+
+      window.location.href = "/auth/login"; // home으로
     } catch (error: unknown) {
-      // 에러 처리
       if (error instanceof Error) {
-        console.error("회원가입 실패:", error.message);
         setErrorMessage(error.message);
       } else {
         setErrorMessage("알 수 없는 오류가 발생했습니다.");
       }
+    } finally {
+      setIsLoading(false); // 로딩 상태 종료
     }
   };
 
@@ -66,11 +71,11 @@ export default function RegisterPage() {
             />
           </div>
           <div className="pt-3 pb-4">
-            <InputTitle title="이름*" />
+            <InputTitle title="사용자 이름*" />
             <InputTxt
               type="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
           </div>
         </div>
@@ -80,7 +85,7 @@ export default function RegisterPage() {
             <p className="text-red-500 text-sm my-2">{errorMessage}</p>
           )}
           {/* 회원가입 버튼 */}
-          <RegisterButton onClick={handleRegister} />
+          <RegisterButton onClick={handleRegister} disabled={isLoading} />
         </div>
       </div>
     </div>

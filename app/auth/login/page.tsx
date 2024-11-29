@@ -1,3 +1,9 @@
+// 로그인 페이지
+/**
+ * 수정
+ * - 에러메시지
+ * - 로그인 버튼 클릭 시 호출함 함수 부분 수정(콘솔 출력 제거)
+ */
 "use client";
 
 import React, { useState } from "react";
@@ -7,32 +13,17 @@ import BackButton from "@/components/common/BackButton";
 import InputTxt from "@/components/login/InputTxt";
 import LoginButton from "@/components/login/LoginButton";
 import LinkText from "@/components/common/LinkText";
-import { login } from "@/app/services/userApi";
 
 export default function LoginPage() {
   const [email, setEmail] = useState(""); // 이메일 상태
   const [password, setPassword] = useState(""); // 비밀번호 상태
-  const [errorMessage, setErrorMessage] = useState(""); // 에러 메시지 상태
 
-  // 로그인 버튼 클릭 시 호출할 함수
-  const handleLogin = async () => {
-    try {
-      const { token, user } = await login(email, password); // 로그인 API 호출
-      console.log("로그인 성공:", user);
-      console.log("토큰:", token);
-      // 토큰 저장
-      localStorage.setItem("authToken", token);
-      alert("로그인 성공!");
-      window.location.href = "/";
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error("로그인 실패:", error.message);
-        setErrorMessage(error.message || "로그인 중 오류가 발생했습니다.");
-      } else {
-        console.error("예기치 못한 오류 발생");
-        setErrorMessage("알 수 없는 오류가 발생했습니다.");
-      }
-    }
+  // 로그인 버튼 클릭 시 호출할 함수 (콘솔 빼고)
+  const handleLogin = () => {
+    console.log("이메일:", email);
+    console.log("비밀번호:", password);
+    alert("로그인 버튼 클릭(테스트)");
+    // 동작 추가해야 함
   };
 
   return (
@@ -47,9 +38,8 @@ export default function LoginPage() {
         <div className="flex justify-center items-center mb-6">
           <h2 className="login-title relative">
             <span className="blind">로그인 타이틀</span>{" "}
-            {/* 스크린 리더용 텍스트 */}
             <Image
-              src="/login_title.png" // 이미지 경로
+              src="/login_title.png"
               alt="로그인 타이틀 이미지"
               layout="intrinsic" // 이미지 비율 유지
               width={250} // 실제 이미지 너비
@@ -78,9 +68,6 @@ export default function LoginPage() {
           </div>
         </div>
         {/* 에러 메시지 */}
-        {errorMessage && (
-          <div className="text-red-500 text-sm mt-2">{errorMessage}</div>
-        )}
         <div>
           {/* 로그인 버튼 */}
           <LoginButton onClick={handleLogin} />

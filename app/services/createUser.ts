@@ -1,6 +1,5 @@
-import apiClient from "./apiClient";
+import axios from "axios";
 
-// 사용자 계정 생성 API 호출 함수
 export const createUser = async (
   username: string,
   password: string,
@@ -8,22 +7,23 @@ export const createUser = async (
   profileImageId: string
 ): Promise<{ message: string; userId: string }> => {
   try {
-    const response = await apiClient.post("/api/users/signup", {
+    const response = await axios.post(`/api/users/signup`, {
       username,
       password,
       email,
-      profile_image_id: profileImageId,
+      profile_image_url: profileImageId, // 프로필 이미지 경로 전달
     });
 
-    return response.data; // 성공 응답 반환
+    // 성공 시 응답 데이터 반환
+    return response.data;
   } catch (error) {
-    // error를 명시적으로 처리
-    if (error instanceof Error) {
-      console.error("사용자 계정 생성 실패:", error.message);
-      throw new Error(error.message);
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        throw new Error(
+          error.response.data.message || "회원가입에 실패했습니다."
+        );
+      }
     }
-
-    // 에러가 객체가 아닐 경우 기본 메시지
-    throw new Error("알 수 없는 오류가 발생했습니다.");
+    throw new Error("서버와 연결할 수 없습니다. 잠시 후 다시 시도해주세요.");
   }
 };

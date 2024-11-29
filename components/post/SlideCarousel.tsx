@@ -1,3 +1,6 @@
+// 이미지 슬라이드 캐러셀 컴포넌트
+// 좌우 버튼과 하단 점 표시를 통해 슬라이드를 제어
+
 import React, { useState } from "react";
 import Image from "next/image";
 
@@ -24,12 +27,12 @@ const SlideCarousel: React.FC<SlideCarouselProps> = ({ images }) => {
 
   // 이전 슬라이드로 이동
   const prevSlide = () => {
-    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : prev));
   };
 
   // 다음 슬라이드로 이동
   const nextSlide = () => {
-    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : prev));
   };
 
   return (
@@ -54,7 +57,7 @@ const SlideCarousel: React.FC<SlideCarouselProps> = ({ images }) => {
         }`}
       >
         <Image
-          src="/arr-left-circle.svg" // 좌측 버튼 이미지 경로
+          src="/arr-left-circle.svg" // 좌측 버튼 이미지
           alt="Previous"
           width={67}
           height={67}
@@ -71,7 +74,7 @@ const SlideCarousel: React.FC<SlideCarouselProps> = ({ images }) => {
         }`}
       >
         <Image
-          src="/arr-right-circle.svg" // 우측 버튼 이미지 경로
+          src="/arr-right-circle.svg" // 우측 버튼 이미지
           alt="Next"
           width={67}
           height={67}
@@ -80,15 +83,20 @@ const SlideCarousel: React.FC<SlideCarouselProps> = ({ images }) => {
 
       {/* 하단 점 표시 */}
       <div className="mt-4 mb-4 left-0 right-0 flex justify-center space-x-2">
-        {images.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentIndex(index)}
-            className={`w-1.5 h-1.5 rounded-full ${
-              currentIndex === index ? "bg-gray-800" : "bg-gray-200"
-            }`}
-          />
-        ))}
+        {images.map(
+          (
+            _,
+            index // image 배열을 순회
+          ) => (
+            <button
+              key={index}
+              onClick={() => setCurrentIndex(index)}
+              className={`w-1.5 h-1.5 rounded-full ${
+                currentIndex === index ? "bg-gray-800" : "bg-gray-200"
+              }`}
+            />
+          )
+        )}
       </div>
     </div>
   );
