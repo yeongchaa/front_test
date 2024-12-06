@@ -5,6 +5,7 @@ import BottomNavigation from "@/components/common/BottomNavigation"; // BottomNa
 import Button from "@/components/common/Button";
 import Image from "next/image";
 import { ShoppingBagIcon } from "@heroicons/react/24/outline";
+import PostCard from "@/components/Masonry/PostCard";
 
 export default function MyPage() {
   // 예시 userName 데이터
@@ -36,6 +37,31 @@ export default function MyPage() {
           className="rounded-full"
         />
 
+        <PostCard
+          socialImg={{
+            src: "/image2.jpeg",
+            alt: "이주미",
+          }}
+          cardDetail={{
+            profileImage: {
+              src: "/profile1.jpeg",
+              alt: "User Profile",
+              width: 20.4,
+              height: 20.4,
+            },
+            userName: {
+              text: "John Doe",
+              type: "small",
+            },
+            like: {
+              size: "small",
+            },
+            textBox: {
+              text: "This is an example post with a description apple banana orange kiwi is an example post with a description apple banana orange kiwi.",
+            },
+          }}
+        />
+
         {/** userName */}
         <p className="text-[18px] font-bold">{userName}</p>
 
@@ -46,19 +72,6 @@ export default function MyPage() {
             label="로그아웃"
             onLogout={handleLogout} // 로그아웃 버튼에 handleLogout 함수 연결
           />
-          {/**
-           * <코드 수정>
-           * 
-           * const handleLogout = async () => {
-  try {
-    await fetch("/api/logout", { method: "POST" });
-    window.location.href = "/";
-  } catch (error) {
-    console.error("로그아웃 실패:", error);
-  }
-};
-
-           */}
         </div>
       </div>
       <div className="w-full mt-6 border-t border-gray-300"></div>
