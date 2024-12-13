@@ -1,9 +1,4 @@
-// 로그인 페이지
-/**
- * 수정
- * - 에러메시지
- * - 로그인 버튼 클릭 시 호출함 함수 부분 수정(콘솔 출력 제거)
- */
+// 로그인 페이지 (form 태그 사용)
 "use client";
 
 import React, { useState } from "react";
@@ -11,19 +6,32 @@ import Image from "next/image";
 import InputTitle from "@/components/login/InputTitle";
 import BackButton from "@/components/common/BackButton";
 import InputTxt from "@/components/login/InputTxt";
-import LoginButton from "@/components/login/LoginButton";
 import LinkText from "@/components/common/LinkText";
 
 export default function LoginPage() {
   const [email, setEmail] = useState(""); // 이메일 상태
   const [password, setPassword] = useState(""); // 비밀번호 상태
+  const [error, setError] = useState<string | null>(null); // 에러 메시지 상태
 
-  // 로그인 버튼 클릭 시 호출할 함수 (콘솔 빼고)
-  const handleLogin = () => {
-    console.log("이메일:", email);
-    console.log("비밀번호:", password);
+  // 폼 제출 이벤트 처리
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault(); // 기본 폼 제출 동작 방지
+    setError(null); // 에러 메시지 초기화
+
+    if (!email || !password) {
+      setError("이메일과 비밀번호를 모두 입력해주세요.");
+      return;
+    }
+
+    // TODO: 로그인 API 연동
+    console.log("로그인 요청:", { email, password });
+
+    // 테스트용 메시지
     alert("로그인 버튼 클릭(테스트)");
-    // 동작 추가해야 함
+
+    // 입력값 초기화
+    setEmail("");
+    setPassword("");
   };
 
   return (
@@ -37,19 +45,19 @@ export default function LoginPage() {
         {/* 타이틀 영역 */}
         <div className="flex justify-center items-center mb-6">
           <h2 className="login-title relative">
-            <span className="blind">로그인 타이틀</span>{" "}
+            <span className="blind">로그인 타이틀</span>
             <Image
               src="/login_title.png"
               alt="로그인 타이틀 이미지"
-              layout="intrinsic" // 이미지 비율 유지
-              width={250} // 실제 이미지 너비
-              height={56} // 실제 이미지 높이
+              layout="intrinsic"
+              width={250}
+              height={56}
             />
           </h2>
         </div>
 
-        {/* 입력 필드 */}
-        <div className="">
+        {/* 입력 필드 및 폼 */}
+        <form onSubmit={handleSubmit} className="">
           <div className="pt-3 pb-4">
             <InputTitle title="이메일 주소" />
             <InputTxt
@@ -66,12 +74,20 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-        </div>
-        {/* 에러 메시지 */}
-        <div>
+
+          {/* 에러 메시지 */}
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
           {/* 로그인 버튼 */}
-          <LoginButton onClick={handleLogin} />
-        </div>
+          <button
+            type="submit"
+            className="bg-black w-full text-white p-2 rounded mt-4"
+          >
+            로그인
+          </button>
+        </form>
+
+        {/* 회원가입 링크 */}
         <div className="flex items-center justify-center mt-5">
           <LinkText text="이메일 가입" href="/auth/register" />
         </div>

@@ -35,7 +35,7 @@ const CardDetail: React.FC<CardDetailProps> = ({
   textBox,
 }) => {
   return (
-    <div className="flex flex-col h-[88px] pt-2 pb-5 px-1">
+    <div className="flex flex-col pt-2 pb-5 px-1">
       <div className="flex items-center">
         <Img {...profileImage} />
         <UserName {...userName} className="flex-1 pl-1 pr-[6px]" />

@@ -20,7 +20,7 @@ const Img: React.FC<ImgProps> = ({
   return (
     <div
       className={`relative ${className} rounded-full`}
-      style={{ width, height }}
+      style={{ width, height, border: "1px solid #dbdbdb" }}
     >
       <Image
         src={src}

@@ -1,20 +1,31 @@
+"use client";
+
 import React from "react";
 import PostCard, { PostCardProps } from "./PostCard";
 
-interface PostCardGridProps {
-  posts: PostCardProps[]; // PostCardProps 배열
+export interface PostCardGridProps {
+  posts: PostCardProps[];
 }
 
 const PostCardGrid: React.FC<PostCardGridProps> = ({ posts }) => {
+  // 두 개의 열로 나누기
+  const columnCount = 2;
+  const columns: PostCardProps[][] = Array.from(
+    { length: columnCount },
+    () => []
+  );
+
+  posts.forEach((post, idx) => {
+    columns[idx % columnCount].push(post); // 번갈아가며 열에 추가
+  });
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {Array.from({ length: 4 }, (_, colIdx) => (
-        <div className="grid gap-4" key={`col-${colIdx}`}>
-          {posts
-            .filter((_, postIdx) => postIdx % 4 === colIdx)
-            .map((post, idx) => (
-              <PostCard key={`postcard-${colIdx}-${idx}`} {...post} />
-            ))}
+    <div className="flex gap-4">
+      {columns.map((column, colIdx) => (
+        <div className="flex flex-col flex-1" key={`col-${colIdx}`}>
+          {column.map((post, idx) => (
+            <PostCard key={`post-${colIdx}-${idx}`} {...post} />
+          ))}
         </div>
       ))}
     </div>

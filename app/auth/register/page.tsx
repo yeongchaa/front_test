@@ -5,7 +5,8 @@ import InputTitle from "@/components/login/InputTitle";
 import BackButton from "@/components/common/BackButton";
 import InputTxt from "@/components/login/InputTxt";
 import RegisterButton from "@/components/login/RegisterButton";
-import { createUser } from "@/app/services/createUser";
+import { createUser } from "@/app/services/userService";
+// 사용자 계정 생성 API 호출
 
 export default function RegisterPage() {
   const [email, setEmail] = useState(""); // 이메일 상태
@@ -16,24 +17,27 @@ export default function RegisterPage() {
 
   const handleRegister = async () => {
     setIsLoading(true); // 로딩 상태 시작
+    setErrorMessage(null); // 이전 에러 메시지 초기화
     try {
-      // 기본 프로필 이미지 경로
-      const defaultProfileImageUrl = "/default-profile.png";
+      // 기본 프로필 이미지 ID 설정 (임시 값 사용)
+      const defaultProfileImageId = "default-profile-image-id";
 
-      // 회원가입 API 호출
-      const response = await createUser(
+      // 사용자 계정 생성 API 호출
+      const response = await createUser({
         username,
         password,
         email,
-        defaultProfileImageUrl
-      );
+        profile_image_id: defaultProfileImageId, // 기본 프로필 이미지 ID 전달
+      });
 
       console.log("회원가입 성공:", response);
 
-      window.location.href = "/auth/login"; // home으로
+      // 회원가입 성공 후 로그인 페이지로 이동
+      window.location.href = "/auth/login";
     } catch (error: unknown) {
+      // 에러 메시지 처리
       if (error instanceof Error) {
-        setErrorMessage(error.message);
+        setErrorMessage(error.message); // API 호출 에러 메시지 출력
       } else {
         setErrorMessage("알 수 없는 오류가 발생했습니다.");
       }

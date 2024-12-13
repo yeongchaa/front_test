@@ -14,8 +14,8 @@ const UserName: React.FC<UserNameProps> = ({
   className,
 }) => {
   const styles = {
-    small: "text-[12px] text-gray-800",
-    medium: "text-[14px] text-gray-800",
+    small: "text-[12px] text-gray-600",
+    medium: "text-[14px] text-gray-600",
   };
 
   return <span className={`${styles[type]} ${className}`}>{text}</span>;

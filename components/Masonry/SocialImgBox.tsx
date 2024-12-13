@@ -1,22 +1,29 @@
-// 스타일 이미지
 "use client";
 
-import React from "react";
 import Image from "next/image";
 
 interface SocialImgBoxProps {
   src: string;
   alt: string;
+  width?: number;
+  height?: number;
 }
 
-const SocialImgBox: React.FC<SocialImgBoxProps> = ({ src, alt }) => {
+const SocialImgBox: React.FC<SocialImgBoxProps> = ({
+  src,
+  alt,
+  width,
+  height,
+}) => {
   return (
-    <div className="relative pt-[134.77%] rounded-[10px] overflow-hidden">
+    <div className="w-full overflow-hidden rounded-[10px]">
       <Image
         src={src}
         alt={alt}
-        className="absolute top-1/2 left-1/2 h-full w-full transform  object-cover"
-        layout="fill"
+        width={width || 300}
+        height={height || 300}
+        layout="intrinsic" // 이미지 비율 유지
+        className="object-cover"
       />
     </div>
   );
