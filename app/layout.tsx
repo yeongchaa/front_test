@@ -4,6 +4,7 @@
 import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"; // React Query 추가
 import "./globals.css";
+import { SessionProvider } from "next-auth/react";
 
 // Query Client 생성
 const queryClient = new QueryClient(); // QueryClient 객체 생성
@@ -17,9 +18,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="font-sans">
       <body>
-        <QueryClientProvider client={queryClient}>
-          {children}
-        </QueryClientProvider>
+        <SessionProvider>
+          <QueryClientProvider client={queryClient}>
+            {children}
+          </QueryClientProvider>
+        </SessionProvider>
       </body>
     </html>
   );

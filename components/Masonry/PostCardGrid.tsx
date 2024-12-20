@@ -1,3 +1,4 @@
+// Masonry 스타일로 PostCard들을 렌더링하는 그리드 컴포넌트
 "use client";
 
 import React from "react";

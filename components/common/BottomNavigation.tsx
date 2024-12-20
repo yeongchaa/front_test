@@ -6,9 +6,14 @@
 import React from "react";
 import BottomLinkIcon from "./BottomLinkIcon";
 import { usePathname } from "next/navigation"; // 현재 경로 확인용
+import { useSession } from "next-auth/react";
 
 const BottomNavigation: React.FC = () => {
   const pathname = usePathname(); // 현재 경로 가져오기
+  const { status } = useSession(); // 세션 및 인증 상태 확인
+
+  // 로그인 여부 확인
+  const isLoggedIn = status === "authenticated";
 
   // 네비게이션 아이템 배열
   const navItems = [
@@ -40,7 +45,7 @@ const BottomNavigation: React.FC = () => {
       imageSrc: "/bottom-my-off.svg",
       activeImageSrc: "/bottom-my-on.svg",
       text: "MY",
-      href: "/profile/mypage",
+      href: isLoggedIn ? "/profile/mypage" : "/auth/login", // 로그인 여부에 따라 경로 변경
     },
   ];
 

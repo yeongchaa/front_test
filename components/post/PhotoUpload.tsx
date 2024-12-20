@@ -1,16 +1,27 @@
 import React, { useState } from "react";
 import Image from "next/image";
 
-export default function PhotoUpload() {
+interface PhotoUploadProps {
+  onFileUpload: (file: File) => Promise<void>;
+}
+
+export default function PhotoUpload({ onFileUpload }: PhotoUploadProps) {
   const [thumbnails, setThumbnails] = useState<string[]>([]);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const files = event.target.files;
     if (files) {
       const newThumbnails = Array.from(files).map((file) =>
         URL.createObjectURL(file)
       );
       setThumbnails((prevThumbnails) => [...prevThumbnails, ...newThumbnails]);
+
+      // 파일 업로드 API 호출
+      for (const file of files) {
+        await onFileUpload(file);
+      }
     }
   };
 
@@ -22,7 +33,6 @@ export default function PhotoUpload() {
 
   return (
     <div className="flex items-center gap-2 mb-4">
-      {/* 썸네일 리스트 */}
       {thumbnails.map((src, index) => (
         <div
           key={index}
@@ -31,11 +41,10 @@ export default function PhotoUpload() {
           <Image
             src={src}
             alt={`Thumbnail ${index}`}
-            layout="fill"
-            objectFit="cover"
+            fill
+            style={{ objectFit: "cover" }}
             unoptimized
           />
-          {/* 삭제 버튼 */}
           <button
             onClick={() => removeThumbnail(index)}
             className="absolute top-1 right-1 bg-gray-800 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full"
@@ -45,7 +54,7 @@ export default function PhotoUpload() {
         </div>
       ))}
 
-      {/* 사진 업로드 버튼 */}
+      {/* 파일 선택 */}
       <label
         htmlFor="photo-upload"
         className="w-[100px] h-[100px] bg-gray-300 flex items-center justify-center text-white font-bold text-2xl cursor-pointer rounded-md"

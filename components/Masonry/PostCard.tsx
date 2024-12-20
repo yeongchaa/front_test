@@ -1,3 +1,4 @@
+// 게시글 카드 하나의 UI를 담당하는 컴포넌트
 "use client";
 
 import React from "react";

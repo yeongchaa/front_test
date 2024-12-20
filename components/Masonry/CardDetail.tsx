@@ -22,6 +22,7 @@ interface CardDetailProps {
   };
   like: {
     size?: "small" | "large";
+    postId: string;
   };
   textBox: {
     text: string;
