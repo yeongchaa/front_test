@@ -7,36 +7,43 @@ import CardDetail from "./CardDetail";
 
 export interface PostCardProps {
   socialImg: {
-    src: string; // 이미지 경로
-    alt: string; // 이미지 설명
-    width?: number; // 이미지 너비
-    height?: number; // 이미지 높이
+    src: string;
+    alt: string;
+    width?: number;
+    height?: number;
   };
   cardDetail: {
     profileImage: {
-      src: string; // 프로필 이미지 경로
-      alt: string; // 프로필 이미지 설명
+      src: string;
+      alt: string;
       width?: number;
       height?: number;
       className?: string;
     };
     userName: {
-      text: string; // 사용자 이름 텍스트
-      type?: "small" | "medium"; // 텍스트 크기
+      text: string;
+      type?: "small" | "medium";
       className?: string;
     };
     like: {
-      size?: "small" | "large"; // 좋아요 버튼 크기
+      size?: "small" | "large";
+      postId: string;
+      likeUsers: string[];
+      userId: string;
     };
     textBox: {
-      text: string; // 카드 텍스트
+      text: string;
     };
   };
+  onClick: (postId: string) => void; // 클릭 핸들러 추가
 }
 
-const PostCard: React.FC<PostCardProps> = ({ socialImg, cardDetail }) => {
+const PostCard: React.FC<PostCardProps> = ({ socialImg, cardDetail, onClick }) => {
   return (
-    <div className="flex flex-col bg-white rounded-lg overflow-hidden">
+    <div
+      className="flex flex-col bg-white rounded-lg overflow-hidden"
+      onClick={() => onClick(cardDetail.like.postId)} // 클릭 시 handlePostClick 호출
+    >
       <SocialImgBox
         src={socialImg.src}
         alt={socialImg.alt}

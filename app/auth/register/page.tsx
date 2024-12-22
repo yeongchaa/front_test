@@ -21,7 +21,7 @@ export default function RegisterPage() {
     setErrorMessage(null);
 
     try {
-      const defaultProfileImageId = "0310e58e-e0e0-4d79-9fa0-76239d76d46d";
+      const defaultProfileImageId = "0310e58e-e0e0-4d79-9fa0-76239d76d46d"; // 기본 프로필 이미지 ID
 
       const response = await axios.post("/api/users/signup", {
         username,

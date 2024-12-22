@@ -22,7 +22,7 @@ const SocialImgBox: React.FC<SocialImgBoxProps> = ({
         alt={alt}
         width={width || 300}
         height={height || 300}
-        layout="intrinsic" // 이미지 비율 유지
+        layout="responsive" // 이미지 비율 유지
         className="object-cover"
       />
     </div>

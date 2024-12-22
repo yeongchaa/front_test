@@ -1,4 +1,3 @@
-// Masonry 스타일로 PostCard들을 렌더링하는 그리드 컴포넌트
 "use client";
 
 import React from "react";
@@ -6,9 +5,10 @@ import PostCard, { PostCardProps } from "./PostCard";
 
 export interface PostCardGridProps {
   posts: PostCardProps[];
+  onPostClick: (postId: string) => void; // 클릭 이벤트 핸들러
 }
 
-const PostCardGrid: React.FC<PostCardGridProps> = ({ posts }) => {
+const PostCardGrid: React.FC<PostCardGridProps> = ({ posts, onPostClick }) => {
   // 두 개의 열로 나누기
   const columnCount = 2;
   const columns: PostCardProps[][] = Array.from(
@@ -25,7 +25,11 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ posts }) => {
       {columns.map((column, colIdx) => (
         <div className="flex flex-col flex-1" key={`col-${colIdx}`}>
           {column.map((post, idx) => (
-            <PostCard key={`post-${colIdx}-${idx}`} {...post} />
+            <PostCard
+              key={`post-${colIdx}-${idx}`}
+              {...post}
+              onClick={onPostClick} // onClick 전달
+            />
           ))}
         </div>
       ))}

@@ -1,120 +1,112 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import SearchHeader from "@/components/post/SearchHeader";
 import BottomNavigation from "@/components/common/BottomNavigation";
 import Sort from "@/components/common/Sort";
 import PostCardGrid from "@/components/Masonry/PostCardGrid";
 import { PostCardProps } from "@/components/Masonry/PostCard";
+import { useRouter } from "next/navigation";
 
 export default function HomePage() {
-  const [posts, setPosts] = useState<PostCardProps[]>([]); // 상태 관리
+  const [posts, setPosts] = useState<PostCardProps[]>([]); // 게시글 데이터
+  const [nextPage, setNextPage] = useState<number | null>(1); // 다음 페이지 번호
+  const [loading, setLoading] = useState(false); // 로딩 상태
+  const [isFetching, setIsFetching] = useState(false); // 무한 스크롤 상태
+  const router = useRouter();
 
-  // 더미 데이터 생성
+  // 게시글 데이터를 가져오는 함수
+  const fetchPosts = async (page: number) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/posts?page=${page}`);
+      const data = await response.json();
+
+      if (!data.posts || !Array.isArray(data.posts)) {
+        console.error("API 응답이 예상된 형식이 아닙니다:", data);
+        return;
+      }
+
+      const formattedData: PostCardProps[] = data.posts.map((item: any) => {
+        const textToDisplay = item.title || item.content || item.tags?.join(", ");
+
+        const firstImage = item.files?.[0]?.file_path
+          ? item.files[0].file_path.startsWith("http")
+            ? item.files[0].file_path
+            : `https://your-server.com${item.files[0].file_path}`
+          : "/default-image.jpeg";
+
+        return {
+          socialImg: { src: firstImage, alt: "게시글 이미지" },
+          cardDetail: {
+            profileImage: {
+              src: item.profile_image_url || "/default-profile.jpeg",
+              alt: "프로필 이미지",
+            },
+            userName: { text: item.username, type: "small" },
+            like: { size: "small", postId: item.id },
+            textBox: { text: textToDisplay },
+          },
+          type: item.type,
+          style: item.style,
+          id: item.id, // postId 전달
+        };
+      });
+
+      setPosts((prevPosts) => [...prevPosts, ...formattedData]);
+      setNextPage(data.nextPage || null);
+    } catch (error) {
+      console.error("데이터를 불러오지 못했습니다:", error);
+    } finally {
+      setLoading(false);
+      setIsFetching(false);
+    }
+  };
+
+  // 스크롤 이벤트 처리 함수
+  const handleScroll = useCallback(() => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop >=
+      document.documentElement.offsetHeight - 200 &&
+      !loading &&
+      nextPage !== null
+    ) {
+      setIsFetching(true);
+    }
+  }, [loading, nextPage]);
+
   useEffect(() => {
-    const dummyData: PostCardProps[] = [
-      {
-        socialImg: { src: "/image2.jpeg", alt: "이미지 1" },
-        cardDetail: {
-          profileImage: {
-            src: "/profile1.jpeg",
-            alt: "프로필 이미지 1",
-          },
-          userName: { text: "userone", type: "small" },
-          like: { size: "small" },
-          textBox: { text: "어그 타스만!!!!!" },
-        },
-      },
-      {
-        socialImg: { src: "/img3.jpeg", alt: "이미지 2" },
-        cardDetail: {
-          profileImage: {
-            src: "/profile1.jpeg",
-            alt: "프로필 이미지 2",
-          },
-          userName: { text: "usertwo", type: "small" },
-          like: { size: "small" },
-          textBox: {
-            text: "아디다스 웨일스 보너..이제 하나쯤은 가지고 있어야 하지 않나 싶어서",
-          },
-        },
-      },
-      {
-        socialImg: { src: "/img5.jpeg", alt: "이미지 3" },
-        cardDetail: {
-          profileImage: {
-            src: "/profile1.jpeg",
-            alt: "프로필 이미지 3",
-          },
-          userName: { text: "userthree", type: "small" },
-          like: { size: "small" },
-          textBox: { text: "겨울룩" },
-        },
-      },
-      {
-        socialImg: { src: "/img6.jpeg", alt: "이미지 4" },
-        cardDetail: {
-          profileImage: {
-            src: "/profile1.jpeg",
-            alt: "프로필 이미지 4",
-          },
-          userName: { text: "userfour", type: "small" },
-          like: { size: "small" },
-          textBox: { text: "겨울에도 에어포스 ~~~~~" },
-        },
-      },
-      {
-        socialImg: { src: "/img7.jpeg", alt: "이미지 5" },
-        cardDetail: {
-          profileImage: {
-            src: "/profile1.jpeg",
-            alt: "프로필 이미지 5",
-          },
-          userName: { text: "userfour", type: "small" },
-          like: { size: "small" },
-          textBox: { text: "바라클라바 좀 바라" },
-        },
-      },
-      {
-        socialImg: { src: "/img8.jpeg", alt: "이미지 6" },
-        cardDetail: {
-          profileImage: {
-            src: "/profile1.jpeg",
-            alt: "프로필 이미지 6",
-          },
-          userName: { text: "userfour", type: "small" },
-          like: { size: "small" },
-          textBox: { text: "아크테릭스 아톰 헤비웨이트 후디 블랙" },
-        },
-      },
-      {
-        socialImg: { src: "/img9.jpeg", alt: "이미지 7" },
-        cardDetail: {
-          profileImage: {
-            src: "/profile1.jpeg",
-            alt: "프로필 이미지 7",
-          },
-          userName: { text: "userfour", type: "small" },
-          like: { size: "small" },
-          textBox: { text: "가볍고 편하고 따듯하고 예쁜 멋진 신발" },
-        },
-      },
-    ];
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [handleScroll]);
 
-    // 데이터를 상태에 설정
-    setPosts(dummyData);
+  useEffect(() => {
+    if (isFetching && nextPage !== null) {
+      fetchPosts(nextPage);
+    }
+  }, [isFetching, nextPage]);
+
+  useEffect(() => {
+    if (nextPage !== null) {
+      fetchPosts(nextPage);
+    }
   }, []);
+
+  // 게시글 클릭 시 상세 페이지로 이동
+  const handlePostClick = (postId: string) => {
+    router.push(`/posts/${postId}`);
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* 검색창 헤더 UI */}
       <SearchHeader />
       <Sort />
       <div className="flex-1 px-4 pb-4">
-        {/* PostCardGrid에 더미 데이터 전달 */}
-        <PostCardGrid posts={posts} />
+        <PostCardGrid posts={posts} onPostClick={handlePostClick} />
+        {loading && <p className="text-center text-gray-500 mt-4">로딩 중...</p>}
       </div>
-      {/* 하단 네비게이션 */}
       <div className="sticky bottom-0">
         <BottomNavigation />
       </div>

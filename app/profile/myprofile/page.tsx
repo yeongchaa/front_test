@@ -5,6 +5,7 @@ import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import BottomNavigation from "@/components/common/BottomNavigation";
 import EditableName from "@/components/login/EditableName";
+import Link from "next/link";
 
 export default function MyProfile() {
   return (
@@ -19,9 +20,9 @@ export default function MyProfile() {
         <h1 className="text-lg font-bold">프로필 관리</h1>
 
         {/* 오른쪽 버튼: 홈 */}
-        <a href="#" className="flex items-center">
+        <Link href="/" className="flex items-center">
           <Image src="/bottom-home.svg" width={24} height={24} alt="home" />
-        </a>
+        </Link>
       </div>
 
       <div className="min-h-screen flex flex-col">
