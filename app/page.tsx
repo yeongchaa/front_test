@@ -28,7 +28,8 @@ export default function HomePage() {
       }
 
       const formattedData: PostCardProps[] = data.posts.map((item: any) => {
-        const textToDisplay = item.title || item.content || item.tags?.join(", ");
+        const textToDisplay =
+          item.title || item.content || item.tags?.join(", ");
 
         const firstImage = item.files?.[0]?.file_path
           ? item.files[0].file_path.startsWith("http")
@@ -40,7 +41,7 @@ export default function HomePage() {
           socialImg: { src: firstImage, alt: "게시글 이미지" },
           cardDetail: {
             profileImage: {
-              src: item.profile_image_url || "/default-profile.jpeg",
+              src: item.profile_image_url || "/default.png",
               alt: "프로필 이미지",
             },
             userName: { text: item.username, type: "small" },
@@ -67,7 +68,7 @@ export default function HomePage() {
   const handleScroll = useCallback(() => {
     if (
       window.innerHeight + document.documentElement.scrollTop >=
-      document.documentElement.offsetHeight - 200 &&
+        document.documentElement.offsetHeight - 200 &&
       !loading &&
       nextPage !== null
     ) {
@@ -96,7 +97,7 @@ export default function HomePage() {
 
   // 게시글 클릭 시 상세 페이지로 이동
   const handlePostClick = (postId: string) => {
-    router.push(`/posts/${postId}`);
+    router.push(`/styles/post/${postId}`);
   };
 
   return (
@@ -105,7 +106,9 @@ export default function HomePage() {
       <Sort />
       <div className="flex-1 px-4 pb-4">
         <PostCardGrid posts={posts} onPostClick={handlePostClick} />
-        {loading && <p className="text-center text-gray-500 mt-4">로딩 중...</p>}
+        {loading && (
+          <p className="text-center text-gray-500 mt-4">로딩 중...</p>
+        )}
       </div>
       <div className="sticky bottom-0">
         <BottomNavigation />

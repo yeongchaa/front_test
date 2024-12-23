@@ -6,6 +6,7 @@ import SocialImgBox from "./SocialImgBox";
 import CardDetail from "./CardDetail";
 
 export interface PostCardProps {
+  id: string;
   socialImg: {
     src: string;
     alt: string;
@@ -38,7 +39,11 @@ export interface PostCardProps {
   onClick: (postId: string) => void; // 클릭 핸들러 추가
 }
 
-const PostCard: React.FC<PostCardProps> = ({ socialImg, cardDetail, onClick }) => {
+const PostCard: React.FC<PostCardProps> = ({
+  socialImg,
+  cardDetail,
+  onClick,
+}) => {
   return (
     <div
       className="flex flex-col bg-white rounded-lg overflow-hidden"

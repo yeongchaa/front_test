@@ -2,38 +2,71 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import CommentInput from "@/components/post/CommentInput";
 import AuthorInfo from "@/components/post/AuthorInfo";
 import CommentIcon from "@/components/post/CommentIcon";
 import BackButton from "@/components/common/BackButton";
 import HeaderTitle from "@/components/common/HeaderTitle";
-import HashtagList from "@/components/post/HashtagList"; // HashtagList 컴포넌트 임포트
-import CommentButton from "@/components/post/CommentButton";
+import HashtagList from "@/components/post/HashtagList";
 import SlideCarousel from "@/components/post/SlideCarousel";
 import Like from "@/components/Masonry/like";
+import CommentBox from "@/components/post/CommentBox";
 
 export default function PostDetailPage() {
   const [postData, setPostData] = useState<any>(null);
   const [loading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [isCommentInputVisible, setCommentInputVisible] = useState(false);
   const [comment, setComment] = useState("");
 
   const router = useRouter();
   const params = useParams();
   const { id } = params;
 
+  const { data: session } = useSession();
+
   // id가 유효한 string인지 확인
   if (typeof id !== "string") {
     throw new Error("Invalid post ID");
   }
 
-  const handleCommentClick = () => {
-    setCommentInputVisible(true);
-  };
-
   const handleChange = (value: string) => {
     setComment(value);
+  };
+
+  const handleCommentSubmit = async () => {
+    if (!comment.trim()) {
+      console.warn("댓글 내용이 비어 있습니다.");
+      return;
+    }
+
+    if (!session) {
+      alert("로그인이 필요합니다.");
+      router.push("/auth/login");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/posts/${id}/comments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.accessToken}`, // 세션에서 가져온 토큰 사용
+        },
+        body: JSON.stringify({
+          content: comment.trim(),
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("댓글 등록 실패");
+      }
+
+      console.log("댓글 등록 성공");
+      setComment(""); // 입력 필드 초기화
+    } catch (err) {
+      console.error("댓글 등록 에러:", err);
+    }
   };
 
   useEffect(() => {
@@ -93,9 +126,9 @@ export default function PostDetailPage() {
         <div className="flex items-center justify-end space-x-4">
           <Like
             size="large"
-            postId={id} // 게시물 ID 전달
-            initialLiked={postData.liked} // 초기 좋아요 상태 전달
-            initialCount={postData.like_count} // 초기 좋아요 수 전달
+            postId={id}
+            initialLiked={postData.liked}
+            initialCount={postData.like_count}
           />
           <CommentIcon />
         </div>
@@ -115,22 +148,33 @@ export default function PostDetailPage() {
         />
       </div>
 
-      {/* 댓글 섹션 */}
-      {!isCommentInputVisible && (
-        <div className="pt-2 h-[129px] flex items-center justify-center border-t border-gray-200">
-          <div className="text-center py-8">
-            <p>첫번째로 댓글을 남겨보세요.</p>
-            <CommentButton onClick={handleCommentClick} />
-          </div>
-        </div>
-      )}
+      {/* 댓글 영역 */}
+      <div className="p-4 border-t border-b border-gray-300 bg-white">
+        {postData.comments && postData.comments.length > 0 ? (
+          postData.comments.map((comment: any, index: number) => (
+            <CommentBox
+              key={index}
+              userName={comment.username}
+              content={comment.content}
+              uploadTime={comment.upload_time}
+              likes={comment.likes}
+            />
+          ))
+        ) : (
+          <p className="text-sm text-gray-500">
+            아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!
+          </p>
+        )}
+      </div>
 
       {/* 댓글 입력 컴포넌트 */}
-      {isCommentInputVisible && (
-        <div className="sticky bottom-0 bg-white p-4 border-t border-gray-300">
-          <CommentInput onChange={handleChange} value={comment} />
-        </div>
-      )}
+      <div className="bg-white p-4 border-t border-gray-300">
+        <CommentInput
+          onChange={handleChange}
+          value={comment}
+          onSubmit={handleCommentSubmit}
+        />
+      </div>
     </div>
   );
 }

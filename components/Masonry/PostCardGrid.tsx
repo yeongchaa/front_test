@@ -2,13 +2,14 @@
 
 import React from "react";
 import PostCard, { PostCardProps } from "./PostCard";
+import Link from "next/link";
 
 export interface PostCardGridProps {
-  posts: PostCardProps[];
+  posts: PostCardProps[]; // 게시글 데이터
   onPostClick: (postId: string) => void; // 클릭 이벤트 핸들러
 }
 
-const PostCardGrid: React.FC<PostCardGridProps> = ({ posts, onPostClick }) => {
+const PostCardGrid: React.FC<PostCardGridProps> = ({ posts }) => {
   // 두 개의 열로 나누기
   const columnCount = 2;
   const columns: PostCardProps[][] = Array.from(
@@ -25,11 +26,13 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ posts, onPostClick }) => {
       {columns.map((column, colIdx) => (
         <div className="flex flex-col flex-1" key={`col-${colIdx}`}>
           {column.map((post, idx) => (
-            <PostCard
+            <Link
+              href={`/styles/post/${post.id}`} // 링크로 연결
               key={`post-${colIdx}-${idx}`}
-              {...post}
-              onClick={onPostClick} // onClick 전달
-            />
+              className="cursor-pointer" // 마우스 손 모양으로 변경
+            >
+              <PostCard {...post} />
+            </Link>
           ))}
         </div>
       ))}

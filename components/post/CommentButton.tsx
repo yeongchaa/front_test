@@ -1,4 +1,4 @@
-// '댓글 쓰기'버튼
+// '댓글 쓰기' 버튼
 import React from "react";
 
 interface CommentButtonProps {
@@ -8,8 +8,8 @@ interface CommentButtonProps {
 const CommentButton: React.FC<CommentButtonProps> = ({ onClick }) => {
   return (
     <button
-      onClick={onClick}
-      className="px-[10px] py-[7px] border-2 border-black rounded-xl mt-[10px] "
+      onClick={onClick} // 클릭 시 이벤트 실행
+      className="px-[10px] py-[7px] border-2 border-black rounded-xl mt-[10px]"
     >
       댓글 쓰기
     </button>
