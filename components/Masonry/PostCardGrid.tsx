@@ -11,7 +11,7 @@ export interface PostCardGridProps {
 
 const PostCardGrid: React.FC<PostCardGridProps> = ({ posts }) => {
   // 두 개의 열로 나누기
-  const columnCount = 2;
+  const columnCount = 4;
   const columns: PostCardProps[][] = Array.from(
     { length: columnCount },
     () => []
@@ -22,7 +22,7 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ posts }) => {
   });
 
   return (
-    <div className="flex gap-4">
+    <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
       {columns.map((column, colIdx) => (
         <div className="flex flex-col flex-1" key={`col-${colIdx}`}>
           {column.map((post, idx) => (

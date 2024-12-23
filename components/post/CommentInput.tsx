@@ -51,7 +51,7 @@ const CommentInput: React.FC<CommentInputProps> = ({
       </div>
 
       {/* 텍스트 입력 필드 */}
-      <div className="flex-1 bg-[#fafafa] border border-[#f6f6f6] rounded-full w-full px-4 py-2 relative">
+      <div className="flex-1 bg-[#fafafa] border border-[#f6f6f6] rounded-full w-full h-[41px] px-4 py-2 relative">
         <div
           ref={inputRef}
           contentEditable
@@ -59,7 +59,7 @@ const CommentInput: React.FC<CommentInputProps> = ({
           onInput={handleInput}
           className="bg-transparent outline-none placeholder-gray-400 text-sm overflow-hidden text-ellipsis"
           style={{
-            minHeight: "41px", // 최소 높이 설정
+            minHeight: "40.6px", // 최소 높이 설정
             lineHeight: "1.5rem",
             whiteSpace: "pre-wrap", // 줄바꿈 허용
             wordWrap: "break-word", // 긴 단어 줄바꿈

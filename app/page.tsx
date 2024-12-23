@@ -35,7 +35,7 @@ export default function HomePage() {
           ? item.files[0].file_path.startsWith("http")
             ? item.files[0].file_path
             : `https://your-server.com${item.files[0].file_path}`
-          : "/default-image.jpeg";
+          : "/img5.jpeg";
 
         return {
           socialImg: { src: firstImage, alt: "게시글 이미지" },
