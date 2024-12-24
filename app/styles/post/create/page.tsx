@@ -81,6 +81,7 @@ export default function CreatePostPage() {
       file_ids,
       type: selectedGender,
       style: selectedStyle,
+      comments: [],
     };
 
     console.log("게시글 데이터 준비됨:", postData);

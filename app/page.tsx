@@ -97,6 +97,7 @@ export default function HomePage() {
 
   // 게시글 클릭 시 상세 페이지로 이동
   const handlePostClick = (postId: string) => {
+    console.log("HomePage: Post clicked", postId);
     router.push(`/styles/post/${postId}`);
   };
 

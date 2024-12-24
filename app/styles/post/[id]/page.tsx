@@ -14,8 +14,27 @@ import Like from "@/components/Masonry/like";
 import CommentBox from "@/components/post/CommentBox";
 
 export default function PostDetailPage() {
-  const [postData, setPostData] = useState<any>(null);
-  const [loading, setIsLoading] = useState(true);
+  interface Comment {
+    username: string;
+    content: string;
+    upload_time: string;
+    likes: number;
+  }
+
+  interface PostData {
+    username: string;
+    created_at: string;
+    title: string;
+    content: string;
+    tags: string[];
+    files: { file_path: string }[];
+    liked: boolean;
+    like_count: number;
+    comments: Comment[];
+  }
+
+  const [postData, setPostData] = useState<PostData | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [comment, setComment] = useState("");
 
@@ -30,11 +49,32 @@ export default function PostDetailPage() {
     throw new Error("Invalid post ID");
   }
 
+  // 게시물 데이터를 가져오는 함수
+  const fetchPostDetail = async () => {
+    try {
+      setLoading(true); // 로딩 상태 시작
+      const response = await fetch(`/api/posts/${id}`);
+      if (!response.ok) throw new Error("Failed to fetch post data");
+
+      const data = await response.json();
+      setPostData(data);
+    } catch (err) {
+      console.error("Error fetching post:", err);
+      setError(true);
+    } finally {
+      setLoading(false); // 로딩 상태 종료
+    }
+  };
+
+  // 댓글 입력 핸들러
   const handleChange = (value: string) => {
     setComment(value);
   };
 
+  // 댓글 제출 핸들러
   const handleCommentSubmit = async () => {
+    const scrollPosition = window.scrollY; // 현재 스크롤 위치 저장
+
     if (!comment.trim()) {
       console.warn("댓글 내용이 비어 있습니다.");
       return;
@@ -63,28 +103,20 @@ export default function PostDetailPage() {
       }
 
       console.log("댓글 등록 성공");
+
+      // 댓글 작성 후 게시물 데이터를 다시 가져옴
+      await fetchPostDetail();
+
+      window.scrollTo(0, scrollPosition);
+
       setComment(""); // 입력 필드 초기화
     } catch (err) {
       console.error("댓글 등록 에러:", err);
     }
   };
 
+  // 컴포넌트 로드 시 게시물 데이터 가져오기
   useEffect(() => {
-    const fetchPostDetail = async () => {
-      try {
-        const response = await fetch(`/api/posts/${id}`);
-        if (!response.ok) throw new Error("Failed to fetch post data");
-
-        const data = await response.json();
-        setPostData(data);
-      } catch (err) {
-        console.error("Error fetching post:", err);
-        setError(true);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchPostDetail();
   }, [id]);
 

@@ -40,6 +40,7 @@ export interface PostCardProps {
 }
 
 const PostCard: React.FC<PostCardProps> = ({
+  id,
   socialImg,
   cardDetail,
   onClick,
@@ -47,7 +48,10 @@ const PostCard: React.FC<PostCardProps> = ({
   return (
     <div
       className="flex flex-col bg-white rounded-lg overflow-hidden"
-      onClick={() => onClick(cardDetail.like.postId)} // 클릭 시 handlePostClick 호출
+      onClick={() => {
+        console.log("PostCard: Clicked ID", id);
+        onClick(id);
+      }} // 클릭 시 handlePostClick 호출
     >
       <SocialImgBox
         src={socialImg.src}

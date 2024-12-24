@@ -9,7 +9,7 @@ export interface PostCardGridProps {
   onPostClick: (postId: string) => void; // 클릭 이벤트 핸들러
 }
 
-const PostCardGrid: React.FC<PostCardGridProps> = ({ posts }) => {
+const PostCardGrid: React.FC<PostCardGridProps> = ({ posts, onPostClick }) => {
   // 두 개의 열로 나누기
   const columnCount = 4;
   const columns: PostCardProps[][] = Array.from(
@@ -31,7 +31,16 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ posts }) => {
               key={`post-${colIdx}-${idx}`}
               className="cursor-pointer" // 마우스 손 모양으로 변경
             >
-              <PostCard {...post} />
+              <PostCard
+                {...post}
+                onClick={(postId) => {
+                  console.log("PostCardGrid Prop: Post clicked:", {
+                    posts,
+                    onPostClick,
+                  }); // 확인만하고 제거하기
+                  onPostClick(postId);
+                }}
+              />
             </Link>
           ))}
         </div>
