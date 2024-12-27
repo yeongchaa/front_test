@@ -1,21 +1,19 @@
-// 마이페이지 화면
 "use client";
 
+import { signOut, useSession } from "next-auth/react"; // signOut 및 useSession 가져오기
 import BottomNavigation from "@/components/common/BottomNavigation"; // BottomNavigation 컴포넌트 경로에 맞게 설정
 import Button from "@/components/common/Button";
 import Image from "next/image";
 import { ShoppingBagIcon } from "@heroicons/react/24/outline";
 
 export default function MyPage() {
-  // 예시 userName 데이터
-  const userName = "chachalee";
+  const { data: session } = useSession(); // 세션 정보 가져오기
 
-  // 로그아웃 처리 함수 (단순 동작 처리)
+  // 로그아웃 처리 함수
   const handleLogout = () => {
-    console.log("로그아웃 처리 중...");
-    alert("로그아웃 되었습니다."); // 성공 메시지 출력
-    // 로그아웃 후 이동 로직 추가 가능
-    window.location.href = "/"; // 홈 페이지로 이동
+    signOut({
+      callbackUrl: "/", // 로그아웃 후 이동할 URL
+    });
   };
 
   return (
@@ -37,7 +35,9 @@ export default function MyPage() {
         />
 
         {/** userName */}
-        <p className="text-[18px] font-bold">{userName}</p>
+        <p className="text-[18px] font-bold">
+          {session?.user?.id || "Guest"} {/* 사용자 이름 표시 */}
+        </p>
 
         {/** 프로필 관리 & 로그아웃 버튼 */}
         <div className="flex space-x-2">
