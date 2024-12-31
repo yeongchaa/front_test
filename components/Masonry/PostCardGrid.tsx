@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
+import Masonry from "react-masonry-css"; // 라이브러리 import
 import PostCard, { PostCardProps } from "./PostCard";
-import Link from "next/link";
 
 export interface PostCardGridProps {
   posts: PostCardProps[]; // 게시글 데이터
@@ -10,42 +10,32 @@ export interface PostCardGridProps {
 }
 
 const PostCardGrid: React.FC<PostCardGridProps> = ({ posts, onPostClick }) => {
-  // 두 개의 열로 나누기
-  const columnCount = 4;
-  const columns: PostCardProps[][] = Array.from(
-    { length: columnCount },
-    () => []
-  );
-
-  posts.forEach((post, idx) => {
-    columns[idx % columnCount].push(post); // 번갈아가며 열에 추가
-  });
+  // Masonry의 브레이크포인트 설정
+  const breakpointColumns = {
+    default: 4, // 기본 열 개수
+    768: 2, // 화면 너비가 768px 이하일 때 2개
+  };
 
   return (
-    <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
-      {columns.map((column, colIdx) => (
-        <div className="flex flex-col flex-1" key={`col-${colIdx}`}>
-          {column.map((post, idx) => (
-            <Link
-              href={`/styles/post/${post.id}`} // 링크로 연결
-              key={`post-${colIdx}-${idx}`}
-              className="cursor-pointer" // 마우스 손 모양으로 변경
-            >
-              <PostCard
-                {...post}
-                onClick={(postId) => {
-                  console.log("PostCardGrid Prop: Post clicked:", {
-                    posts,
-                    onPostClick,
-                  }); // 확인만하고 제거하기
-                  onPostClick(postId);
-                }}
-              />
-            </Link>
-          ))}
+    <Masonry
+      breakpointCols={breakpointColumns}
+      className="flex" // Masonry 컨테이너 스타일
+      columnClassName="p space-y-0.5" // 각 열 스타일
+    >
+      {posts.map((post, index) => (
+        <div
+          key={`${post.id}-${index}`}
+          className="bg-white px-1.5 rounded-lg transition-shadow cursor-pointer"
+        >
+          <PostCard
+            {...post}
+            onClick={(postId) => {
+              onPostClick(postId);
+            }}
+          />
         </div>
       ))}
-    </div>
+    </Masonry>
   );
 };
 

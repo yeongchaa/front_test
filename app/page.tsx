@@ -15,10 +15,32 @@ export default function HomePage() {
   const [isFetching, setIsFetching] = useState(false); // 무한 스크롤 상태
   const router = useRouter();
 
+  // 이메일 캐싱
+  const emailToProfileImage: Record<string, string> = {};
+
+  // 프로필 이미지를 이메일 기반으로 가져오는 함수
+  const fetchUserProfileImage = async (email: string): Promise<string> => {
+    if (emailToProfileImage[email]) {
+      return emailToProfileImage[email];
+    }
+    try {
+      const response = await fetch(`/api/users/${email}`);
+      const userData = await response.json();
+      const profileImage = userData.profile_image_url || "/default.png";
+      emailToProfileImage[email] = profileImage; // 캐싱
+      return profileImage;
+    } catch (error) {
+      console.error(`Failed to fetch profile image for ${email}:`, error);
+      return "/default.png"; // 기본 프로필 이미지 반환
+    }
+  };
+
   // 게시글 데이터를 가져오는 함수
   const fetchPosts = async (page: number) => {
     try {
       setLoading(true);
+
+      // 게시글 API 호출
       const response = await fetch(`/api/posts?page=${page}`);
       const data = await response.json();
 
@@ -27,32 +49,38 @@ export default function HomePage() {
         return;
       }
 
-      const formattedData: PostCardProps[] = data.posts.map((item: any) => {
-        const textToDisplay =
-          item.title || item.content || item.tags?.join(", ");
+      // 데이터 매핑
+      const formattedData: PostCardProps[] = await Promise.all(
+        data.posts.map(async (item: any) => {
+          const textToDisplay =
+            item.title || item.content || item.tags?.join(", ");
 
-        const firstImage = item.files?.[0]?.file_path
-          ? item.files[0].file_path.startsWith("http")
-            ? item.files[0].file_path
-            : `https://your-server.com${item.files[0].file_path}`
-          : "/img5.jpeg";
+          const firstImage = item.files?.[0]?.file_path
+            ? item.files[0].file_path.startsWith("http")
+              ? item.files[0].file_path
+              : `https://your-server.com${item.files[0].file_path}`
+            : "/default.png";
 
-        return {
-          socialImg: { src: firstImage, alt: "게시글 이미지" },
-          cardDetail: {
-            profileImage: {
-              src: item.profile_image_url || "/default.png",
-              alt: "프로필 이미지",
+          // 이메일로 프로필 이미지 가져오기
+          const profileImage = await fetchUserProfileImage(item.email);
+
+          return {
+            socialImg: { src: firstImage, alt: "게시글 이미지" },
+            cardDetail: {
+              profileImage: {
+                src: profileImage,
+                alt: `${item.username || "프로필 이미지"}`,
+              },
+              userName: { text: item.username, type: "small" },
+              like: { size: "small", postId: item.id },
+              textBox: { text: textToDisplay },
             },
-            userName: { text: item.username, type: "small" },
-            like: { size: "small", postId: item.id },
-            textBox: { text: textToDisplay },
-          },
-          type: item.type,
-          style: item.style,
-          id: item.id, // postId 전달
-        };
-      });
+            type: item.type,
+            style: item.style,
+            id: item.id, // postId 전달
+          };
+        })
+      );
 
       setPosts((prevPosts) => [...prevPosts, ...formattedData]);
       setNextPage(data.nextPage || null);
@@ -93,7 +121,7 @@ export default function HomePage() {
     if (nextPage !== null) {
       fetchPosts(nextPage);
     }
-  }, []);
+  });
 
   // 게시글 클릭 시 상세 페이지로 이동
   const handlePostClick = (postId: string) => {
@@ -105,7 +133,7 @@ export default function HomePage() {
     <div className="flex flex-col min-h-screen">
       <SearchHeader />
       <Sort />
-      <div className="flex-1 px-4 pb-4">
+      <div className="flex-1 px-4 pb-2">
         <PostCardGrid posts={posts} onPostClick={handlePostClick} />
         {loading && (
           <p className="text-center text-gray-500 mt-4">로딩 중...</p>

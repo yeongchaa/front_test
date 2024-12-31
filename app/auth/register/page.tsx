@@ -21,18 +21,19 @@ export default function RegisterPage() {
     setErrorMessage(null);
 
     try {
-      const defaultProfileImageId = "0310e58e-e0e0-4d79-9fa0-76239d76d46d"; // 기본 프로필 이미지 ID
+      const DEFAULT_PROFILE_IMAGE_ID = "0310e58e-e0e0-4d79-9fa0-76239d76d46d"; // 기본 프로필 이미지 ID
 
+      // 회원가입 API 요청
       const response = await axios.post("/api/users/signup", {
         username,
         password,
         email,
-        profile_image_id: defaultProfileImageId,
+        profile_image_id: DEFAULT_PROFILE_IMAGE_ID, // 기본 프로필 이미지 ID 포함
       });
 
       if (response.status === 201) {
-        router.push("/auth/login"); // 성공 시 로그인 페이지로 이동
         alert("회원가입 성공");
+        router.push("/auth/login"); // 성공 시 로그인 페이지로 이동
       }
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
@@ -48,10 +49,10 @@ export default function RegisterPage() {
   };
 
   return (
-    <div>
+    <div className="min-h-screen bg-white">
       {/* 뒤로가기 버튼 */}
       <div className="h-[44px] flex items-center px-[16px]">
-        <BackButton onBack={() => console.log("뒤로 가기")} />
+        <BackButton onBack={() => router.back()} />
       </div>
 
       <div className="px-4 pt-5">
@@ -65,6 +66,7 @@ export default function RegisterPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder="example@email.com"
             />
           </div>
           <div className="pt-3 pb-4">
@@ -73,6 +75,7 @@ export default function RegisterPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="8자 이상 비밀번호 입력"
             />
           </div>
           <div className="pt-3 pb-4">
@@ -81,6 +84,7 @@ export default function RegisterPage() {
               type="name"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              placeholder="사용할 이름 입력"
             />
           </div>
         </div>
@@ -91,7 +95,12 @@ export default function RegisterPage() {
         )}
 
         {/* 회원가입 버튼 */}
-        <RegisterButton onClick={handleRegister} disabled={isLoading} />
+        <div className="mt-6">
+          <RegisterButton
+            onClick={handleRegister}
+            disabled={isLoading || !email || !password || !username}
+          />
+        </div>
       </div>
     </div>
   );
