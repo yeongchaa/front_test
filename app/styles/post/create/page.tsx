@@ -124,7 +124,7 @@ export default function CreatePostPage() {
     <div>
       {/* 상단 헤더 */}
       <div className="my-2 mr-2 ml-4 h-[44px] flex items-center bg-white relative justify-between">
-        <BackButton onBack={() => console.log("뒤로 가기")} />
+        <BackButton onBack={() => router.back()} />
         <HeaderTitle title="스타일 올리기" />
         <button onClick={handleSubmitPost} className="font-bold">
           등록

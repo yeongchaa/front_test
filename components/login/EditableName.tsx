@@ -83,14 +83,14 @@ const EditableName: React.FC = () => {
       }`}
     >
       <h5 className="text-[13px] text-[rgba(34,34,34,.5)] mb-2">프로필 이름</h5>
-      <div className="flex items-center justify-between">
+      <div>
         {isEditing ? (
           <div>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="py-2 pr-[58px] text-[rgba(34,34,34,.85)] border-b border-black  w-full mr-4"
+              className="py-2 pr-[58px] text-[rgba(34,34,34,.85)] border-b border-black w-full mr-4 focus:outline-none"
             />
             <p className="text-[rgba(34,34,34,.5)] text-[11px]">
               변경 후 30일이 지나야 다시 변경 가능하므로 신중히 변경해주세요.

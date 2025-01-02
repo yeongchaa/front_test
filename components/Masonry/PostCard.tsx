@@ -4,6 +4,7 @@
 import React from "react";
 import SocialImgBox from "./SocialImgBox";
 import CardDetail from "./CardDetail";
+import Image from "next/image";
 
 export interface PostCardProps {
   id: string;
@@ -12,6 +13,7 @@ export interface PostCardProps {
     alt: string;
     width?: number;
     height?: number;
+    imageCount?: number; // 이미지 개수
   };
   cardDetail: {
     profileImage: {
@@ -53,12 +55,27 @@ const PostCard: React.FC<PostCardProps> = ({
         onClick(id);
       }} // 클릭 시 handlePostClick 호출
     >
-      <SocialImgBox
-        src={socialImg.src}
-        alt={socialImg.alt}
-        width={socialImg.width}
-        height={socialImg.height}
-      />
+      <div className="relative">
+        {/* 이미지 박스 */}
+        <SocialImgBox
+          src={socialImg.src}
+          alt={socialImg.alt}
+          width={socialImg.width}
+          height={socialImg.height}
+        />
+        {/* 여러 장의 이미지가 있을 경우 아이콘 표시 */}
+        {socialImg.imageCount && socialImg.imageCount > 1 && (
+          <div className="absolute top-2 right-2 flex items-center">
+            <Image
+              src="/multi.svg" // 사용하려는 아이콘 이미지 경로
+              alt="아이콘"
+              width={20} // 아이콘 너비
+              height={20} // 아이콘 높이
+              className="w-5 h-5" // 추가적인 TailwindCSS 스타일
+            />
+          </div>
+        )}
+      </div>
       <CardDetail {...cardDetail} />
     </div>
   );

@@ -143,7 +143,7 @@ export default function MyProfile() {
             style={{ width: 80, height: 80 }}
           >
             <Image
-              src={profileImage} // 서버에서 받은 이미지를 우선 사용
+              src={profileImage}
               alt="profile photo"
               width={80}
               height={80}

@@ -65,7 +65,12 @@ export default function HomePage() {
           const profileImage = await fetchUserProfileImage(item.email);
 
           return {
-            socialImg: { src: firstImage, alt: "게시글 이미지" },
+            socialImg: {
+              src: firstImage,
+              alt: "게시글 이미지",
+              imageCount: item.files?.length || 0, // 이미지 개수 추가
+            },
+
             cardDetail: {
               profileImage: {
                 src: profileImage,
@@ -121,7 +126,7 @@ export default function HomePage() {
     if (nextPage !== null) {
       fetchPosts(nextPage);
     }
-  });
+  }, [nextPage]);
 
   // 게시글 클릭 시 상세 페이지로 이동
   const handlePostClick = (postId: string) => {

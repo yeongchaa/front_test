@@ -181,7 +181,7 @@ export default function PostDetailPage() {
       </div>
 
       {/* 댓글 영역 */}
-      <div className="p-4 border-t border-b border-gray-300 bg-white">
+      <div className="pt-2 border-t border-gray-300 bg-white">
         {postData.comments && postData.comments.length > 0 ? (
           postData.comments.map((comment: any, index: number) => (
             <CommentBox
@@ -193,14 +193,24 @@ export default function PostDetailPage() {
             />
           ))
         ) : (
-          <p className="text-sm text-gray-500">
-            아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!
-          </p>
+          <div className="flex flex-col items-center py-8">
+            <p className="text-[13px] text-[rgba(34,34,34,0.8)]">
+              첫번째로 댓글을 남겨보세요.
+            </p>
+            <button className="rounded-[10px] text-[13px] border border-black h-[30px] px-[10px] py-[7px] mt-[10px]">
+              댓글쓰기
+            </button>
+          </div>
         )}
       </div>
 
       {/* 댓글 입력 컴포넌트 */}
-      <div className="bg-white p-4 border-t border-gray-300">
+      <div
+        className="sticky bottom-0 bg-white"
+        style={{
+          borderTop: "0.8px solid rgba(34, 34, 34, 0.05)",
+        }}
+      >
         <CommentInput
           onChange={handleChange}
           value={comment}

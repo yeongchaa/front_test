@@ -17,7 +17,7 @@ const CommentInput: React.FC<CommentInputProps> = ({
   // 입력 필드 높이 자동 조절
   useEffect(() => {
     if (inputRef.current) {
-      inputRef.current.style.height = "auto"; // 높이를 초기화
+      inputRef.current.style.height = "40.6px"; // 초기 높이 설정
       inputRef.current.style.height = `${inputRef.current.scrollHeight}px`; // 컨텐츠 높이에 맞게 조정
     }
   }, [value]);
@@ -32,58 +32,63 @@ const CommentInput: React.FC<CommentInputProps> = ({
   const handleSubmit = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
 
-    // 등록 버튼을 누르는 순간 입력 필드 초기화
-    onChange(""); // value를 즉시 초기화
+    if (value.trim() === "") return; // 빈 값은 처리하지 않음
+
+    onChange(""); // 입력 필드 초기화
     onSubmit(); // 댓글 등록 처리
   };
 
   return (
-    <div className="flex items-start w-full pb-4">
-      {/* 프로필 이미지 */}
-      <div className="w-[34px] h-[34px] mr-2">
-        <Image
-          src="/default.png"
-          alt="Profile"
-          width={34}
-          height={34}
-          className="rounded-full object-cover"
-        />
-      </div>
+    <div className="border-t border-[rgb(240, 240, 240)] bg-white sticky bottom-0">
+      <div className="w-full">
+        <div className="py-[6px] px-4 flex items-start">
+          {/* 프로필 이미지 */}
+          <div className="w-[34px] h-[34px] mr-2">
+            <Image
+              src="/default.png"
+              alt="Profile"
+              width={34}
+              height={34}
+              className="rounded-full object-cover border border-[rgba(34,34,34,0.1)]"
+            />
+          </div>
 
-      {/* 텍스트 입력 필드 */}
-      <div className="flex-1 bg-[#fafafa] border border-[#f6f6f6] rounded-full w-full h-[41px] px-4 py-2 relative">
-        <div
-          ref={inputRef}
-          contentEditable
-          suppressContentEditableWarning
-          onInput={handleInput}
-          className="bg-transparent outline-none placeholder-gray-400 text-sm overflow-hidden text-ellipsis"
-          style={{
-            minHeight: "40.6px", // 최소 높이 설정
-            lineHeight: "1.5rem",
-            whiteSpace: "pre-wrap", // 줄바꿈 허용
-            wordWrap: "break-word", // 긴 단어 줄바꿈
-          }}
-        >
-          {value === "" && (
-            <span className="text-gray-400 absolute left-4 top-2 pointer-events-none">
-              댓글을 남기세요...
-            </span>
-          )}
+          {/* 텍스트 입력 필드 */}
+          <div className="flex items-center bg-[#fafafa] border border-[rgba(34,34,34,0.1)] rounded-full w-full px-4 py-2 relative h-[40.6px]">
+            {/* Placeholder */}
+            {value === "" && (
+              <div className="text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                댓글을 남기세요...
+              </div>
+            )}
+
+            {/* 입력 필드 */}
+            <div
+              ref={inputRef}
+              contentEditable
+              suppressContentEditableWarning
+              onInput={handleInput}
+              className="flex-1 bg-transparent outline-none text-sm overflow-hidden flex items-center"
+              style={{
+                minHeight: "40.6px", // 초기 높이 설정
+                lineHeight: "1.5rem",
+                whiteSpace: "pre-wrap", // 줄바꿈 허용
+                wordWrap: "break-word", // 긴 단어 줄바꿈
+              }}
+            ></div>
+
+            {/* 등록 버튼 */}
+            {value && (
+              <a
+                href="#"
+                onClick={handleSubmit}
+                className="text-[14px] font-medium ml-2"
+              >
+                등록
+              </a>
+            )}
+          </div>
         </div>
-      </div>
-
-      {/* 등록 버튼 */}
-      <div className="ml-2">
-        {value && (
-          <a
-            href="#"
-            onClick={handleSubmit} // 등록 버튼 클릭 이벤트 처리
-            className="text-sm text-black font-medium"
-          >
-            등록
-          </a>
-        )}
       </div>
     </div>
   );

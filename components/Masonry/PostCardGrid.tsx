@@ -24,14 +24,12 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ posts, onPostClick }) => {
     >
       {posts.map((post, index) => (
         <div
-          key={`${post.id}-${index}`}
+          key={`${post.id}-${index}`} // 고유한 key 생성
           className="bg-white px-1.5 rounded-lg transition-shadow cursor-pointer"
         >
           <PostCard
-            {...post}
-            onClick={(postId) => {
-              onPostClick(postId);
-            }}
+            {...post} // PostCardProps의 모든 데이터 전달
+            onClick={onPostClick} // 클릭 이벤트 전달
           />
         </div>
       ))}
