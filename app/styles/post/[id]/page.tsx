@@ -12,6 +12,8 @@ import HashtagList from "@/components/post/HashtagList";
 import SlideCarousel from "@/components/post/SlideCarousel";
 import Like from "@/components/Masonry/like";
 import CommentBox from "@/components/post/CommentBox";
+import { formatDistanceToNow, differenceInDays, format } from "date-fns";
+import { ko } from "date-fns/locale";
 
 export default function PostDetailPage() {
   interface Comment {
@@ -188,7 +190,17 @@ export default function PostDetailPage() {
               key={index}
               userName={comment.username}
               content={comment.content}
-              uploadTime={comment.upload_time}
+              uploadTime={
+                comment.created_at
+                  ? differenceInDays(new Date(), new Date(comment.created_at)) >
+                    7
+                    ? format(new Date(comment.created_at), "yyyy-MM-dd")
+                    : formatDistanceToNow(new Date(comment.created_at), {
+                        addSuffix: true,
+                        locale: ko,
+                      })
+                  : "시간 정보 없음"
+              }
               likes={comment.likes}
             />
           ))
