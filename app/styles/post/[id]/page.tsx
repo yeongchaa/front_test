@@ -30,8 +30,8 @@ export default function PostDetailPage() {
     content: string;
     tags: string[];
     files: { file_path: string }[];
-    liked: boolean;
-    like_count: number;
+    like_users: string[]; // 좋아요 사용자 목록
+    like_count: number; // 좋아요 수
     comments: Comment[];
   }
 
@@ -161,7 +161,7 @@ export default function PostDetailPage() {
           <Like
             size="large"
             postId={id}
-            initialLiked={postData.liked}
+            likeUsers={postData.like_users}
             initialCount={postData.like_count}
           />
           <CommentIcon />

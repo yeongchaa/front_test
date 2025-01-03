@@ -7,6 +7,7 @@ import Sort from "@/components/common/Sort";
 import PostCardGrid from "@/components/Masonry/PostCardGrid";
 import { PostCardProps } from "@/components/Masonry/PostCard";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function HomePage() {
   const [posts, setPosts] = useState<PostCardProps[]>([]); // 게시글 데이터
@@ -14,26 +15,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false); // 로딩 상태
   const [isFetching, setIsFetching] = useState(false); // 무한 스크롤 상태
   const router = useRouter();
-
-  // 이메일 캐싱
-  const emailToProfileImage: Record<string, string> = {};
-
-  // 프로필 이미지를 이메일 기반으로 가져오는 함수
-  const fetchUserProfileImage = async (email: string): Promise<string> => {
-    if (emailToProfileImage[email]) {
-      return emailToProfileImage[email];
-    }
-    try {
-      const response = await fetch(`/api/users/${email}`);
-      const userData = await response.json();
-      const profileImage = userData.profile_image_url || "/default.png";
-      emailToProfileImage[email] = profileImage; // 캐싱
-      return profileImage;
-    } catch (error) {
-      console.error(`Failed to fetch profile image for ${email}:`, error);
-      return "/default.png"; // 기본 프로필 이미지 반환
-    }
-  };
+  const { data: session } = useSession(); // 세션 데이터 가져오기
 
   // 게시글 데이터를 가져오는 함수
   const fetchPosts = async (page: number) => {
@@ -50,42 +32,48 @@ export default function HomePage() {
       }
 
       // 데이터 매핑
-      const formattedData: PostCardProps[] = await Promise.all(
-        data.posts.map(async (item: any) => {
-          const textToDisplay =
-            item.title || item.content || item.tags?.join(", ");
+      const formattedData: PostCardProps[] = data.posts.map((item: any) => {
+        const textToDisplay =
+          item.title || item.content || item.tags?.join(", ");
 
-          const firstImage = item.files?.[0]?.file_path
-            ? item.files[0].file_path.startsWith("http")
-              ? item.files[0].file_path
-              : `https://your-server.com${item.files[0].file_path}`
-            : "/default.png";
+        const firstImage = item.files?.[0]?.file_path
+          ? item.files[0].file_path.startsWith("http")
+            ? item.files[0].file_path
+            : `https://your-server.com${item.files[0].file_path}`
+          : "/default.png";
 
-          // 이메일로 프로필 이미지 가져오기
-          const profileImage = await fetchUserProfileImage(item.email);
+        // 사용자가 해당 게시글에 좋아요를 눌렀는지 확인
+        const isLiked =
+          session?.user?.id && item.like_users?.includes(session.user.id);
 
-          return {
-            socialImg: {
-              src: firstImage,
-              alt: "게시글 이미지",
-              imageCount: item.files?.length || 0, // 이미지 개수 추가
+        return {
+          socialImg: {
+            src: firstImage,
+            alt: "게시글 이미지",
+            imageCount: item.files?.length || 0, // 이미지 개수 추가
+          },
+
+          cardDetail: {
+            profileImage: {
+              src: "/default.png", // 기본 프로필 이미지 사용
+              alt: `${item.username || "프로필 이미지"}`,
             },
-
-            cardDetail: {
-              profileImage: {
-                src: profileImage,
-                alt: `${item.username || "프로필 이미지"}`,
-              },
-              userName: { text: item.username, type: "small" },
-              like: { size: "small", postId: item.id },
-              textBox: { text: textToDisplay },
+            userName: { text: item.username, type: "small" },
+            like: {
+              size: "small",
+              postId: item.id,
+              likeUsers: item.like_users,
+              initialCount: item.like_count, // 좋아요 수 전달
             },
-            type: item.type,
-            style: item.style,
-            id: item.id, // postId 전달
-          };
-        })
-      );
+            textBox: { text: textToDisplay },
+          },
+          type: item.type,
+          style: item.style,
+          id: item.id, // postId 전달
+          like_count: item.like_count, // 좋아요 수 출력
+          isLiked, // 좋아요 상태 전달
+        };
+      });
 
       setPosts((prevPosts) => [...prevPosts, ...formattedData]);
       setNextPage(data.nextPage || null);

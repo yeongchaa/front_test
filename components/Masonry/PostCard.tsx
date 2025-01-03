@@ -32,7 +32,7 @@ export interface PostCardProps {
       size?: "small" | "large";
       postId: string;
       likeUsers: string[];
-      userId: string;
+      initialCount: number;
     };
     textBox: {
       text: string;
