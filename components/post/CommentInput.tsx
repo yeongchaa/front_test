@@ -71,7 +71,7 @@ const CommentInput: React.FC<CommentInputProps> = ({
               className="flex-1 bg-transparent outline-none text-sm overflow-hidden flex items-center"
               style={{
                 minHeight: "40.6px", // 초기 높이 설정
-                lineHeight: "1.5rem",
+                lineHeight: "40.6px",
                 whiteSpace: "pre-wrap", // 줄바꿈 허용
                 wordWrap: "break-word", // 긴 단어 줄바꿈
               }}
