@@ -17,10 +17,12 @@ import { ko } from "date-fns/locale";
 
 export default function PostDetailPage() {
   interface Comment {
+    id: string;
     username: string;
     content: string;
-    upload_time: string;
+    created_at: string;
     likes: number;
+    parent_id: string | null; // 부모 ID (null이면 댓글, 값이 있으면 답글)
   }
 
   interface PostData {
@@ -30,8 +32,8 @@ export default function PostDetailPage() {
     content: string;
     tags: string[];
     files: { file_path: string }[];
-    like_users: string[]; // 좋아요 사용자 목록
-    like_count: number; // 좋아요 수
+    like_users: string[];
+    like_count: number;
     comments: Comment[];
   }
 
@@ -39,24 +41,23 @@ export default function PostDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [comment, setComment] = useState("");
+  const [replyParentId, setReplyParentId] = useState<string | null>(null);
+  const [replyToUsername, setReplyToUsername] = useState<string | null>(null);
 
   const router = useRouter();
   const params = useParams();
   const { id } = params;
-
   const { data: session } = useSession();
 
   const commentInputRef = useRef<HTMLDivElement>(null);
 
-  // id가 유효한 string인지 확인
   if (typeof id !== "string") {
     throw new Error("Invalid post ID");
   }
 
-  // 게시물 데이터를 가져오는 함수
   const fetchPostDetail = async () => {
     try {
-      setLoading(true); // 로딩 상태 시작
+      setLoading(true);
       const response = await fetch(`/api/posts/${id}`);
       if (!response.ok) throw new Error("Failed to fetch post data");
 
@@ -66,24 +67,19 @@ export default function PostDetailPage() {
       console.error("Error fetching post:", err);
       setError(true);
     } finally {
-      setLoading(false); // 로딩 상태 종료
+      setLoading(false);
     }
   };
 
-  // 댓글 입력 핸들러
   const handleChange = (value: string) => {
     setComment(value);
   };
 
-  // 댓글 제출 핸들러
   const handleCommentSubmit = async () => {
-    const scrollPosition = window.scrollY; // 현재 스크롤 위치 저장
+    const targetId = replyParentId || id; // 답글의 경우 parent_id 사용, 댓글은 게시글 ID 사용
+    const scrollPosition = window.scrollY;
 
-    if (!comment.trim()) {
-      console.warn("댓글 내용이 비어 있습니다.");
-      return;
-    }
-
+    if (!comment.trim()) return;
     if (!session) {
       alert("로그인이 필요합니다.");
       router.push("/auth/login");
@@ -91,11 +87,11 @@ export default function PostDetailPage() {
     }
 
     try {
-      const response = await fetch(`/api/posts/${id}/comments`, {
+      const response = await fetch(`/api/posts/${targetId}/comments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session.accessToken}`, // 세션에서 가져온 토큰 사용
+          Authorization: `Bearer ${session.accessToken}`,
         },
         body: JSON.stringify({
           content: comment.trim(),
@@ -108,34 +104,43 @@ export default function PostDetailPage() {
 
       console.log("댓글 등록 성공");
 
-      // 댓글 작성 후 게시물 데이터를 다시 가져옴
       await fetchPostDetail();
 
       window.scrollTo(0, scrollPosition);
 
-      setComment(""); // 입력 필드 초기화
+      setComment("");
+      setReplyParentId(null);
+      setReplyToUsername(null);
     } catch (err) {
       console.error("댓글 등록 에러:", err);
     }
   };
 
-  // 댓글 입력창으로 포커스 이동
-  const handleCommentFocus = () => {
+  const handleReplyClick = (parentId: string, username: string) => {
+    console.log("Reply Parent ID:", parentId); // 확인 로그
+    console.log("Reply Username:", username); // 확인 로그
+    setReplyParentId(parentId); // 답글의 부모 ID 설정
+    setReplyToUsername(username); // 답글 대상 사용자 이름 설정
+
+    // 입력 필드에 포커스 및 커서를 끝으로 이동
     if (commentInputRef.current) {
       commentInputRef.current.focus();
-
-      // 커서를 contentEditable 요소의 끝으로 이동
-      const selection = window.getSelection();
       const range = document.createRange();
+      const selection = window.getSelection();
       range.selectNodeContents(commentInputRef.current);
-      range.collapse(false); // 커서를 끝으로 설정
+      range.collapse(false);
       selection?.removeAllRanges();
       selection?.addRange(range);
     }
   };
 
-  // 컴포넌트 로드 시 게시물 데이터 가져오기
+  const handleCancelReply = () => {
+    setReplyParentId(null);
+    setReplyToUsername(null);
+  };
+
   useEffect(() => {
+    console.log("Fetching post details...");
     fetchPostDetail();
   }, [id]);
 
@@ -144,7 +149,6 @@ export default function PostDetailPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Header */}
       <div className="h-[44px] flex items-center px-[16px] bg-white">
         <div className="flex item-center">
           <BackButton onBack={() => router.back()} />
@@ -154,7 +158,6 @@ export default function PostDetailPage() {
         </div>
       </div>
 
-      {/* 작성자 정보 */}
       <div className="py-2 px-4">
         <AuthorInfo
           userName={postData.username}
@@ -163,7 +166,6 @@ export default function PostDetailPage() {
         />
       </div>
 
-      {/* 메인 콘텐츠 */}
       <div className="flex-1">
         <SlideCarousel
           images={postData.files.map(
@@ -172,7 +174,6 @@ export default function PostDetailPage() {
         />
       </div>
 
-      {/* 좋아요 버튼 */}
       <div className="py-3 px-4">
         <div className="flex items-center justify-end space-x-4">
           <Like
@@ -184,13 +185,11 @@ export default function PostDetailPage() {
           <CommentIcon />
         </div>
 
-        {/* 제목 + 내용 */}
         <div className="pt-[13px]">
           <h2 className="text-xl font-bold">{postData.title}</h2>
           <p className="text-gray-700 mt-2">{postData.content}</p>
         </div>
 
-        {/* 해시태그 리스트 */}
         <HashtagList
           hashtags={postData.tags.map((tag: string) => ({
             text: `#${tag}`,
@@ -199,12 +198,12 @@ export default function PostDetailPage() {
         />
       </div>
 
-      {/* 댓글 영역 */}
       <div className="pt-2 border-t border-gray-300 bg-white">
         {postData.comments && postData.comments.length > 0 ? (
-          postData.comments.map((comment: any, index: number) => (
+          postData.comments.map((comment: any) => (
             <CommentBox
-              key={index}
+              key={comment.id}
+              id={comment.id}
               userName={comment.username}
               content={comment.content}
               uploadTime={
@@ -219,6 +218,11 @@ export default function PostDetailPage() {
                   : "시간 정보 없음"
               }
               likes={comment.likes}
+              onReplyClick={(parentId, username) => {
+                console.log("onReplyClick called with:", parentId, username);
+                handleReplyClick(parentId, username);
+              }}
+              replies={comment.replies}
             />
           ))
         ) : (
@@ -228,7 +232,11 @@ export default function PostDetailPage() {
             </p>
             <button
               className="rounded-[10px] text-[13px] border border-black h-[30px] px-[10px] py-[7px] mt-[10px]"
-              onClick={handleCommentFocus}
+              onClick={() => {
+                setReplyParentId(null); // 댓글 작성이므로 parent_id를 null로
+                setReplyToUsername(null); // 답글 대상 사용자 초기화
+                commentInputRef.current?.focus(); // 입력 필드에 포커스
+              }}
             >
               댓글쓰기
             </button>
@@ -236,13 +244,20 @@ export default function PostDetailPage() {
         )}
       </div>
 
-      {/* 댓글 입력 컴포넌트 */}
       <div
         className="sticky bottom-0 bg-white"
         style={{
           borderTop: "0.8px solid rgba(34, 34, 34, 0.05)",
         }}
       >
+        {replyToUsername && (
+          <div className="px-4 py-2 bg-gray-100 text-sm text-gray-700 flex items-center justify-between">
+            <span>@{replyToUsername}님에게 답글쓰기</span>
+            <button onClick={handleCancelReply} className="text-red-500">
+              X
+            </button>
+          </div>
+        )}
         <CommentInput
           onChange={handleChange}
           value={comment}

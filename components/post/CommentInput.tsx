@@ -1,3 +1,4 @@
+// 댓글 입력 + 제출
 import React, { useRef, useEffect } from "react";
 import Image from "next/image";
 
@@ -5,7 +6,7 @@ interface CommentInputProps {
   onChange: (value: string) => void; // 텍스트 입력 변경 이벤트
   value: string; // 입력된 값
   onSubmit: () => void; // 등록 버튼 클릭 이벤트 핸들러
-  inputRef?: React.RefObject<HTMLDivElement>; // 부모로부터 전달받은 ref (optional)
+  inputRef?: React.RefObject<HTMLDivElement>; // 부모로부터 전달받은 ref
 }
 
 const CommentInput: React.FC<CommentInputProps> = ({
@@ -34,6 +35,7 @@ const CommentInput: React.FC<CommentInputProps> = ({
 
   const handleSubmit = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
+    console.log("Submit clicked"); // 확인 로그 추가
 
     if (value.trim() === "") return; // 빈 값은 처리하지 않음
 
