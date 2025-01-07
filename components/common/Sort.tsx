@@ -1,8 +1,18 @@
 "use client";
-import React, { useState } from "react"; // React에서 useState를 불러옴
+import React, { useState } from "react";
 
-const Sort: React.FC = () => {
-  const [selected, setSelected] = useState<string>("인기순"); // 현재 선택된 상태 관리
+interface SortProps {
+  onSortChange: (sortType: string) => void; // 부모로부터 받는 함수의 타입 정의
+}
+
+const Sort: React.FC<SortProps> = ({ onSortChange }) => {
+  const [selected, setSelected] = useState<string>("popularity");
+
+  // Handle sort click and update selected state
+  const handleSortClick = (sortType: string) => {
+    setSelected(sortType); // 선택된 정렬 기준 업데이트
+    onSortChange(sortType); // 부모 컴포넌트로 전달
+  };
 
   return (
     <div className="h-[41px] py-3 px-4">
@@ -10,10 +20,10 @@ const Sort: React.FC = () => {
         <li className="relative">
           <a
             href="#"
-            onClick={() => setSelected("인기순")} // 클릭 시 '인기순'으로 상태 업데이트
+            onClick={() => handleSortClick("popularity")}
             className={`choice ${
-              selected === "인기순" ? "font-bold" : "font-normal"
-            }`} // 선택된 항목에 따라 클래스 적용
+              selected === "popularity" ? "font-bold" : "font-normal"
+            }`}
           >
             인기순
           </a>
@@ -24,10 +34,10 @@ const Sort: React.FC = () => {
         <li className="relative">
           <a
             href="#"
-            onClick={() => setSelected("최신순")} // 클릭 시 '최신순'으로 상태 업데이트
+            onClick={() => handleSortClick("latest")}
             className={`choice ${
-              selected === "최신순" ? "font-bold" : "font-normal"
-            }`} // 선택된 항목에 따라 클래스 적용
+              selected === "latest" ? "font-bold" : "font-normal"
+            }`}
           >
             최신순
           </a>

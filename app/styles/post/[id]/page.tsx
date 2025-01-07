@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import CommentInput from "@/components/post/CommentInput";
@@ -45,6 +45,8 @@ export default function PostDetailPage() {
   const { id } = params;
 
   const { data: session } = useSession();
+
+  const commentInputRef = useRef<HTMLDivElement>(null);
 
   // id가 유효한 string인지 확인
   if (typeof id !== "string") {
@@ -114,6 +116,21 @@ export default function PostDetailPage() {
       setComment(""); // 입력 필드 초기화
     } catch (err) {
       console.error("댓글 등록 에러:", err);
+    }
+  };
+
+  // 댓글 입력창으로 포커스 이동
+  const handleCommentFocus = () => {
+    if (commentInputRef.current) {
+      commentInputRef.current.focus();
+
+      // 커서를 contentEditable 요소의 끝으로 이동
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(commentInputRef.current);
+      range.collapse(false); // 커서를 끝으로 설정
+      selection?.removeAllRanges();
+      selection?.addRange(range);
     }
   };
 
@@ -209,7 +226,10 @@ export default function PostDetailPage() {
             <p className="text-[13px] text-[rgba(34,34,34,0.8)]">
               첫번째로 댓글을 남겨보세요.
             </p>
-            <button className="rounded-[10px] text-[13px] border border-black h-[30px] px-[10px] py-[7px] mt-[10px]">
+            <button
+              className="rounded-[10px] text-[13px] border border-black h-[30px] px-[10px] py-[7px] mt-[10px]"
+              onClick={handleCommentFocus}
+            >
               댓글쓰기
             </button>
           </div>
@@ -227,6 +247,7 @@ export default function PostDetailPage() {
           onChange={handleChange}
           value={comment}
           onSubmit={handleCommentSubmit}
+          inputRef={commentInputRef}
         />
       </div>
     </div>

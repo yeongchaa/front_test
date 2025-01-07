@@ -5,22 +5,25 @@ interface CommentInputProps {
   onChange: (value: string) => void; // 텍스트 입력 변경 이벤트
   value: string; // 입력된 값
   onSubmit: () => void; // 등록 버튼 클릭 이벤트 핸들러
+  inputRef?: React.RefObject<HTMLDivElement>; // 부모로부터 전달받은 ref (optional)
 }
 
 const CommentInput: React.FC<CommentInputProps> = ({
   onChange,
   value,
   onSubmit,
+  inputRef, // 부모로부터 전달받은 ref
 }) => {
-  const inputRef = useRef<HTMLDivElement>(null);
+  const internalInputRef = useRef<HTMLDivElement>(null); // 내부 ref 생성
+  const ref = inputRef || internalInputRef; // 전달받은 ref가 없으면 내부 ref 사용
 
   // 입력 필드 높이 자동 조절
   useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.style.height = "40.6px"; // 초기 높이 설정
-      inputRef.current.style.height = `${inputRef.current.scrollHeight}px`; // 컨텐츠 높이에 맞게 조정
+    if (ref.current) {
+      ref.current.style.height = "40.6px"; // 초기 높이 설정
+      ref.current.style.height = `${ref.current.scrollHeight}px`; // 컨텐츠 높이에 맞게 조정
     }
-  }, [value]);
+  }, [value, ref]);
 
   const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
     const target = e.target as HTMLDivElement;
@@ -64,7 +67,7 @@ const CommentInput: React.FC<CommentInputProps> = ({
 
             {/* 입력 필드 */}
             <div
-              ref={inputRef}
+              ref={ref} // 부모로부터 전달받은 ref 또는 내부 ref
               contentEditable
               suppressContentEditableWarning
               onInput={handleInput}

@@ -38,6 +38,8 @@ export interface PostCardProps {
       text: string;
     };
   };
+  like_count: number; // 좋아요 개수
+  created_at: string; // 생성 시간
   onClick: (postId: string) => void; // 클릭 핸들러 추가
 }
 
