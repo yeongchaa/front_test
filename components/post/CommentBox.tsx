@@ -8,16 +8,17 @@ import { ko } from "date-fns/locale";
 
 export interface Reply {
   id: string;
-  username: string;
+  user_id: string;
+  parent_id: string;
   content: string;
   created_at: string;
-  likes: number;
-  user_id: string;
-  currentUserId: string; // 현재 로그인한 유저의 ID
-  onCommentDelete: (commentId: string) => Promise<void>;
+  username: string;
+  like_count: number;
+  like_users: [];
 }
-
 interface CommentBoxProps {
+  // CommentBox 컴포넌트에 전달되는 '속성'의 구조를 나타냄
+  // 프론트엔드에서 댓글 데이터를 UI로 표현하기 위한 컴포넌트의 요구 사항을 정의
   id: string; // 댓글 ID
   userName: string; // 사용자 이름
   content: string; // 댓글 내용
@@ -166,7 +167,7 @@ const CommentBox: React.FC<CommentBoxProps> = ({
                         })
                     : "시간 정보 없음"
                 }
-                likes={reply.likes}
+                likes={reply.like_count}
                 user_id={reply.user_id}
                 currentUserId={currentUserId}
                 onReplyClick={onReplyClick}

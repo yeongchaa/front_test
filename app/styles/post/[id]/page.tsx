@@ -19,24 +19,29 @@ import { Reply } from "@/components/post/CommentBox";
 export default function PostDetailPage() {
   interface Comment {
     id: string;
-    username: string;
-    content: string;
-    created_at: string;
-    likes: number;
     user_id: string;
     parent_id: string | null; // 부모 ID (null이면 댓글, 값이 있으면 답글)
+    content: string;
+    created_at: string;
+    username: string;
+    like_count: number;
+    like_users: [];
     replies: Reply[];
   }
 
   interface PostData {
-    username: string;
-    created_at: string;
+    id: string;
+    idx: number;
+    user_id: string;
     title: string;
     content: string;
+    created_at: string;
+    updated_at: string;
+    username: string;
+    like_count: number;
+    like_users: string[];
     tags: string[];
     files: { file_path: string }[];
-    like_users: string[];
-    like_count: number;
     comments: Comment[];
   }
 
@@ -251,7 +256,7 @@ export default function PostDetailPage() {
                         })
                     : "시간 정보 없음"
                 }
-                likes={comment.likes}
+                likes={comment.like_count}
                 user_id={comment.user_id}
                 currentUserId={session?.user?.id || ""}
                 postId={id}
