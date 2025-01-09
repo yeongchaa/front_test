@@ -14,6 +14,7 @@ import Like from "@/components/Masonry/like";
 import CommentBox from "@/components/post/CommentBox";
 import { formatDistanceToNow, differenceInDays, format } from "date-fns";
 import { ko } from "date-fns/locale";
+import { Reply } from "@/components/post/CommentBox";
 
 export default function PostDetailPage() {
   interface Comment {
@@ -22,7 +23,9 @@ export default function PostDetailPage() {
     content: string;
     created_at: string;
     likes: number;
+    user_id: string;
     parent_id: string | null; // 부모 ID (null이면 댓글, 값이 있으면 답글)
+    replies: Reply[];
   }
 
   interface PostData {
@@ -62,6 +65,7 @@ export default function PostDetailPage() {
       if (!response.ok) throw new Error("Failed to fetch post data");
 
       const data = await response.json();
+      console.log("Fetched Post Data:", data); // 디버깅 로그 추가
       setPostData(data);
     } catch (err) {
       console.error("Error fetching post:", err);
@@ -117,12 +121,9 @@ export default function PostDetailPage() {
   };
 
   const handleReplyClick = (parentId: string, username: string) => {
-    console.log("Reply Parent ID:", parentId); // 확인 로그
-    console.log("Reply Username:", username); // 확인 로그
     setReplyParentId(parentId); // 답글의 부모 ID 설정
     setReplyToUsername(username); // 답글 대상 사용자 이름 설정
 
-    // 입력 필드에 포커스 및 커서를 끝으로 이동
     if (commentInputRef.current) {
       commentInputRef.current.focus();
       const range = document.createRange();
@@ -139,10 +140,40 @@ export default function PostDetailPage() {
     setReplyToUsername(null);
   };
 
+  const handleCommentDelete = async (
+    commentId: string,
+    replyId: string | null,
+    isReply: boolean
+  ) => {
+    if (!window.confirm("삭제하시겠습니까?")) return;
+
+    try {
+      const url = isReply
+        ? `/api/posts/${commentId}/comments/${replyId}`
+        : `/api/posts/${id}/comments/${commentId}`;
+
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${session?.accessToken}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("댓글 삭제 실패");
+
+      console.log("댓글 삭제 성공");
+
+      await fetchPostDetail();
+    } catch (err) {
+      console.error("댓글 삭제 중 에러 발생:", err);
+    }
+  };
+
   useEffect(() => {
     console.log("Fetching post details...");
     fetchPostDetail();
-  }, [id]);
+    console.log("Session Data:", session); // 디버깅 로그 추가
+  }, [id, session]);
 
   if (loading) return <div>로딩 중...</div>;
   if (error || !postData) return <div>게시물을 불러올 수 없습니다.</div>;
@@ -200,31 +231,39 @@ export default function PostDetailPage() {
 
       <div className="pt-2 border-t border-gray-300 bg-white">
         {postData.comments && postData.comments.length > 0 ? (
-          postData.comments.map((comment: any) => (
-            <CommentBox
-              key={comment.id}
-              id={comment.id}
-              userName={comment.username}
-              content={comment.content}
-              uploadTime={
-                comment.created_at
-                  ? differenceInDays(new Date(), new Date(comment.created_at)) >
-                    7
-                    ? format(new Date(comment.created_at), "yyyy-MM-dd")
-                    : formatDistanceToNow(new Date(comment.created_at), {
-                        addSuffix: true,
-                        locale: ko,
-                      })
-                  : "시간 정보 없음"
-              }
-              likes={comment.likes}
-              onReplyClick={(parentId, username) => {
-                console.log("onReplyClick called with:", parentId, username);
-                handleReplyClick(parentId, username);
-              }}
-              replies={comment.replies}
-            />
-          ))
+          postData.comments.map((comment: Comment) => {
+            return (
+              <CommentBox
+                key={comment.id}
+                id={comment.id}
+                userName={comment.username}
+                content={comment.content}
+                uploadTime={
+                  comment.created_at
+                    ? differenceInDays(
+                        new Date(),
+                        new Date(comment.created_at)
+                      ) > 7
+                      ? format(new Date(comment.created_at), "yyyy-MM-dd")
+                      : formatDistanceToNow(new Date(comment.created_at), {
+                          addSuffix: true,
+                          locale: ko,
+                        })
+                    : "시간 정보 없음"
+                }
+                likes={comment.likes}
+                user_id={comment.user_id}
+                currentUserId={session?.user?.id || ""}
+                postId={id}
+                onReplyClick={(parentId, username) => {
+                  console.log("onReplyClick called with:", parentId, username);
+                  handleReplyClick(parentId, username);
+                }}
+                onCommentDelete={handleCommentDelete}
+                replies={comment.replies}
+              />
+            );
+          })
         ) : (
           <div className="flex flex-col items-center py-8">
             <p className="text-[13px] text-[rgba(34,34,34,0.8)]">
@@ -233,9 +272,9 @@ export default function PostDetailPage() {
             <button
               className="rounded-[10px] text-[13px] border border-black h-[30px] px-[10px] py-[7px] mt-[10px]"
               onClick={() => {
-                setReplyParentId(null); // 댓글 작성이므로 parent_id를 null로
-                setReplyToUsername(null); // 답글 대상 사용자 초기화
-                commentInputRef.current?.focus(); // 입력 필드에 포커스
+                setReplyParentId(null);
+                setReplyToUsername(null);
+                commentInputRef.current?.focus();
               }}
             >
               댓글쓰기
@@ -253,9 +292,7 @@ export default function PostDetailPage() {
         {replyToUsername && (
           <div className="px-4 py-2 bg-gray-100 text-sm text-gray-700 flex items-center justify-between">
             <span>@{replyToUsername}님에게 답글쓰기</span>
-            <button onClick={handleCancelReply} className="text-red-500">
-              X
-            </button>
+            <button onClick={handleCancelReply}>X</button>
           </div>
         )}
         <CommentInput
