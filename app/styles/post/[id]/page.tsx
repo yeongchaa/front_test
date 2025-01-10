@@ -18,6 +18,7 @@ import { Reply } from "@/components/post/CommentBox";
 
 export default function PostDetailPage() {
   interface Comment {
+    // API에서 받아온 댓글 데이터 구조를 나타냄
     id: string;
     user_id: string;
     parent_id: string | null; // 부모 ID (null이면 댓글, 값이 있으면 답글)
@@ -295,7 +296,7 @@ export default function PostDetailPage() {
         }}
       >
         {replyToUsername && (
-          <div className="px-4 py-2 bg-gray-100 text-sm text-gray-700 flex items-center justify-between">
+          <div className="px-4 py-2 bg-gray-100 text-sm text-[rgba(34,34,34,0.5)] flex items-center justify-between">
             <span>@{replyToUsername}님에게 답글쓰기</span>
             <button onClick={handleCancelReply}>X</button>
           </div>
