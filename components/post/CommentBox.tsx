@@ -59,16 +59,6 @@ const CommentBox: React.FC<CommentBoxProps> = ({
     setLikes((prevLikes) => (isLiked ? prevLikes - 1 : prevLikes + 1)); // 좋아요 수 업데이트
   };
 
-  // 디버깅 로그 추가
-  console.log("Rendering CommentBox:");
-  console.log("  Comment ID:", id);
-  console.log("  UserName:", userName);
-  console.log("  Content:", content);
-  console.log("  User ID (comment owner):", user_id);
-  console.log("  Current User ID:", currentUserId);
-  console.log("  Is Reply:", isReply);
-  console.log("  Replies:", replies);
-
   return (
     <div className="px-4 py-3">
       <div className="flex">
@@ -149,7 +139,7 @@ const CommentBox: React.FC<CommentBoxProps> = ({
       {replies.length > 0 && ( // replies가 있을 때만 렌더링
         <div>
           {replies.map((reply) => {
-            console.log("Rendering Reply:", reply); // 디버깅 로그
+            // console.log("Rendering Reply:", reply); // 디버깅 로그
             return (
               <CommentBox
                 key={reply.id}

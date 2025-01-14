@@ -188,7 +188,7 @@ export default function PostDetailPage() {
     <div className="flex flex-col min-h-screen">
       <div className="h-[44px] flex items-center px-[16px] bg-white">
         <div className="flex item-center">
-          <BackButton onBack={() => router.back()} />
+          <BackButton onBack={() => router.push("/")} />
         </div>
         <div className="flex-grow flex justify-center">
           <HeaderTitle title="게시물" />
@@ -200,6 +200,8 @@ export default function PostDetailPage() {
           userName={postData.username}
           createdAt={postData.created_at}
           showTime={true}
+          id={postData.id}
+          authorId={postData.user_id}
         />
       </div>
 
@@ -223,8 +225,8 @@ export default function PostDetailPage() {
         </div>
 
         <div className="pt-[13px]">
-          <h2 className="text-xl font-bold">{postData.title}</h2>
-          <p className="text-gray-700 mt-2">{postData.content}</p>
+          <h2 className="text-[17px] font-bold">{postData.title}</h2>
+          <p className="text-gray-700 mt-2 text-[14px]">{postData.content}</p>
         </div>
 
         <HashtagList
@@ -278,6 +280,14 @@ export default function PostDetailPage() {
             <button
               className="rounded-[10px] text-[13px] border border-black h-[30px] px-[10px] py-[7px] mt-[10px]"
               onClick={() => {
+                if (!session) {
+                  // 로그인하지 않은 경우
+                  alert("로그인이 필요합니다.");
+                  router.push("/auth/login"); // 로그인 페이지로 이동
+                  return;
+                }
+
+                // 로그인이 된 경우 동작
                 setReplyParentId(null);
                 setReplyToUsername(null);
                 commentInputRef.current?.focus();

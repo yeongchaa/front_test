@@ -83,7 +83,6 @@ export default function HomePage() {
     });
   };
 
-  // Sort data based on selected criteria
   const sortData = (
     data: PostCardProps[],
     sortType: string

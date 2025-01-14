@@ -1,3 +1,5 @@
+// 게시글 관련 좋아요 기능 구현
+
 import React, { useState, useEffect } from "react";
 import { HeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
