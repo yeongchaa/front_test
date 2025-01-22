@@ -11,6 +11,7 @@ import HashtagList from "@/components/post/HashtagList";
 import SlideCarousel from "@/components/post/SlideCarousel";
 import Like from "@/components/Masonry/like";
 import CommentBox from "@/components/post/CommentBox";
+//import CommentInput from "@/components/post/CommentInput";
 //import { formatDistanceToNow, differenceInDays, format } from "date-fns";
 //import { ko } from "date-fns/locale";
 
@@ -136,21 +137,33 @@ export default function PostDetailPage() {
             borderTopWidth: "0.8px",
           }}
         >
-          <div>
-            <CommentBox
-              postId={id}
-              comments={[
-                ...postData.comments.map((comment) => ({
-                  ...(comment || []),
-                })),
-              ].sort(
-                (a, b) =>
-                  new Date(a.created_at).getTime() -
-                  new Date(b.created_at).getTime()
-              )}
-            />
-          </div>
+          {postData.comments.length === 0 ? (
+            <div className="text-[13px] py-8 text-center">
+              <p className="text-[rgba(34,34,34,0.7)]">
+                첫번째로 댓글을 남겨보세요.
+              </p>
+              <button className="px-[10px] py-[7px] mt-[10px] border border-black rounded-[10px]">
+                댓글쓰기
+              </button>
+            </div>
+          ) : (
+            <div>
+              <CommentBox
+                postId={id}
+                comments={[
+                  ...postData.comments.map((comment) => ({
+                    ...(comment || []),
+                  })),
+                ].sort(
+                  (a, b) =>
+                    new Date(a.created_at).getTime() -
+                    new Date(b.created_at).getTime()
+                )}
+              />
+            </div>
+          )}
         </div>
+        {/** <CommentInput /> */}
       </div>
     </div>
   );
