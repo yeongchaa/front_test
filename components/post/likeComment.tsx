@@ -1,5 +1,3 @@
-// 댓글, 답글 좋아요 기능 컴포넌트
-
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -51,6 +49,7 @@ const LikeComment: React.FC<LikeCommentProps> = ({
     // 낙관적 업데이트
     setToggleHeart(newLiked);
     setCount(newCount);
+    console.log(`[LikeComment] Optimistic update - Count: ${newCount}`);
 
     try {
       const response = await fetch(
@@ -59,7 +58,7 @@ const LikeComment: React.FC<LikeCommentProps> = ({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${session.accessToken}`, // 인증 토큰 추가
+            Authorization: `Bearer ${session.accessToken}`,
           },
           body: JSON.stringify({ liked: newLiked }),
         }
@@ -70,13 +69,23 @@ const LikeComment: React.FC<LikeCommentProps> = ({
       }
 
       const data = await response.json();
-      setCount(data.comments.like_count); // 서버 응답으로 좋아요 수 업데이트
+      // console.log("[LikeComment] Server response data:", data);
+
+      // 서버 응답 기반으로 상태 동기화
+      if (data?.like_count !== undefined) {
+        setCount(data.like_count);
+        // console.log(
+        //   `[LikeComment] Synced with server - Count: ${data.like_count}`
+        // );
+      }
     } catch (error) {
-      console.error("Error updating like:", error);
+      console.error("[LikeComment] Error updating like:", error);
 
       // 롤백
+      const rollbackCount = newLiked ? count - 1 : count + 1;
       setToggleHeart(!newLiked);
-      setCount(newLiked ? newCount - 1 : newCount + 1);
+      setCount(rollbackCount);
+      // console.log(`[LikeComment] Rollback update - Count: ${rollbackCount}`);
     }
   };
 
@@ -84,9 +93,9 @@ const LikeComment: React.FC<LikeCommentProps> = ({
     <div onClick={handleClick} className="cursor-pointer">
       {type === "icon" &&
         (toggleHeart ? (
-          <HeartIconSolid className="text-red-500" />
+          <HeartIconSolid className="w-7 h-7 text-red-500" />
         ) : (
-          <HeartIcon className="text-gray-500" />
+          <HeartIcon className="w-7 h-7 text-gray-400" />
         ))}
       {type === "count" && <span>{count}</span>}
     </div>

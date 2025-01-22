@@ -57,7 +57,7 @@ export default function PostDetailPage() {
       if (!response.ok) throw new Error("Failed to fetch post data");
 
       const data = await response.json();
-      console.log("Fetched Post Data:", data); // 디버깅 로그 추가
+
       setPostData(data);
     } catch (err) {
       console.error("Error fetching post:", err);
@@ -68,7 +68,6 @@ export default function PostDetailPage() {
   };
 
   useEffect(() => {
-    console.log("Fetching post details...");
     fetchPostDetail();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, session]);
@@ -138,11 +137,11 @@ export default function PostDetailPage() {
           }}
         >
           <div>
-            comment_unit
             <CommentBox
+              postId={id}
               comments={[
                 ...postData.comments.map((comment) => ({
-                  ...(comment || []), // 기본값 추가
+                  ...(comment || []),
                 })),
               ].sort(
                 (a, b) =>
